@@ -584,6 +584,7 @@ function setupEventListeners() {
     }
     uploadModal.style.display = 'flex';
     resetUploadForm();
+    setupChapterInputHandlers();
   });
 
   closeUploadModal.addEventListener('click', closeModal);
@@ -2761,6 +2762,49 @@ function resetUploadForm() {
   if (thumbnailPlaceholder) {
     thumbnailPlaceholder.style.display = 'flex';
   }
+
+  // Reset chapters
+  const chaptersList = document.getElementById('chaptersList');
+  if (chaptersList) {
+    chaptersList.innerHTML = `
+      <div class="chapter-input-row">
+        <input type="text" class="chapter-time-input" placeholder="0:00" value="0:00">
+        <input type="text" class="chapter-title-input" placeholder="Chapter title">
+        <button class="remove-chapter-btn"><i class="ph ph-x"></i></button>
+      </div>
+    `;
+  }
+}
+
+// Setup chapter input handlers
+function setupChapterInputHandlers() {
+  const addChapterBtn = document.getElementById('addChapterBtn');
+  const chaptersList = document.getElementById('chaptersList');
+
+  if (addChapterBtn && chaptersList) {
+    addChapterBtn.addEventListener('click', () => {
+      const row = document.createElement('div');
+      row.className = 'chapter-input-row';
+      row.innerHTML = `
+        <input type="text" class="chapter-time-input" placeholder="0:00">
+        <input type="text" class="chapter-title-input" placeholder="Chapter title">
+        <button class="remove-chapter-btn"><i class="ph ph-x"></i></button>
+      `;
+      chaptersList.appendChild(row);
+
+      // Add remove handler
+      row.querySelector('.remove-chapter-btn').addEventListener('click', () => {
+        row.remove();
+      });
+    });
+
+    // Add remove handler to first row
+    chaptersList.querySelector('.remove-chapter-btn')?.addEventListener('click', (e) => {
+      if (chaptersList.querySelectorAll('.chapter-input-row').length > 1) {
+        e.target.closest('.chapter-input-row').remove();
+      }
+    });
+  }
 }
 
 // Close modal
@@ -2776,6 +2820,23 @@ async function handleUpload() {
   const category = document.getElementById('videoCategoryInput').value;
   const tags = document.getElementById('videoTagsInput').value.split(',').map(t => t.trim()).filter(Boolean);
   const thumbnailUrl = document.getElementById('thumbnailUrlInput').value.trim();
+
+  // Get chapters
+  const chapters = [];
+  document.querySelectorAll('.chapter-input-row').forEach(row => {
+    const time = row.querySelector('.chapter-time-input')?.value;
+    const chapterTitle = row.querySelector('.chapter-title-input')?.value;
+    if (time && chapterTitle) {
+      const timeParts = time.split(':');
+      let seconds = 0;
+      if (timeParts.length === 2) {
+        seconds = parseInt(timeParts[0]) * 60 + parseInt(timeParts[1]);
+      } else if (timeParts.length === 3) {
+        seconds = parseInt(timeParts[0]) * 3600 + parseInt(timeParts[1]) * 60 + parseInt(timeParts[2]);
+      }
+      chapters.push({ time: seconds, title: chapterTitle, description: '' });
+    }
+  });
 
   if (!title || !category) {
     utils.showToast('Please fill in required fields', 'error');
@@ -2823,7 +2884,8 @@ async function handleUpload() {
     videoUrl: URL.createObjectURL(selectedFile),
     likes: 0,
     liked: false,
-    subscribed: false
+    subscribed: false,
+    chapters
   };
 
   videos.unshift(newVideo);

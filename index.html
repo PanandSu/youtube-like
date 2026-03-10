@@ -427,6 +427,20 @@
                 <input type="text" id="thumbnailUrlInput" placeholder="Or enter image URL">
               </div>
             </div>
+            <div class="form-group">
+              <label>Chapters</label>
+              <div class="chapters-input-area" id="chaptersInputArea">
+                <p class="form-hint">Add chapters with timestamps (e.g., 0:00 Introduction, 2:30 Main Topic)</p>
+                <div id="chaptersList">
+                  <div class="chapter-input-row">
+                    <input type="text" class="chapter-time-input" placeholder="0:00" value="0:00">
+                    <input type="text" class="chapter-title-input" placeholder="Chapter title">
+                    <button class="remove-chapter-btn"><i class="ph ph-x"></i></button>
+                  </div>
+                </div>
+                <button class="btn-secondary" id="addChapterBtn">+ Add Chapter</button>
+              </div>
+            </div>
           </div>
           <div class="upload-progress" id="uploadProgress" style="display: none;">
             <div class="progress-bar-container">
