@@ -52,6 +52,9 @@ let currentVolume = 1;
 let isMuted = false;
 let selectedFile = null;
 let currentSpeedIndex = 2; // 1x
+let currentVideo = null;
+let currentCategory = 'All';
+let searchQuery = '';
 
 // Initialize app
 async function init() {
@@ -360,6 +363,7 @@ function openVideoPlayer(videoId) {
 
   // Hide main content, show player
   mainContent.style.display = 'none';
+  videoPlayerPage.style.display = '';
   videoPlayerPage.classList.add('active');
 
   // Load video
@@ -402,6 +406,10 @@ window.addEventListener('popstate', () => {
     showHomePage();
   }
 });
+
+// Export functions to window for components
+window.openVideoPlayer = openVideoPlayer;
+window.showHomePage = showHomePage;
 
 // Initialize
 document.addEventListener('DOMContentLoaded', init);

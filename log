@@ -1,0 +1,14 @@
+➜  continuous gh repo create
+? What would you like to do? Create a new repository on github.com from scratch
+? Repository name youtube-like
+? Description a video share website
+? Visibility Public
+? Would you like to add a README file? Yes
+? Would you like to add a .gitignore? Yes
+? Choose a .gitignore template Nextjs
+? Would you like to add a license? Yes
+? Choose a license Apache License 2.0
+? This will create "youtube-like" as a public repository on github.com. Continue? Yes
+✓ Created repository PanandSu/youtube-like on github.com
+  https://github.com/PanandSu/youtube-like
+? Clone the new repository locally? No
