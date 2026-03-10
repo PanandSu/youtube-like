@@ -116,6 +116,10 @@
           <i class="ph-fill ph-fire"></i>
           <span>Trending</span>
         </a>
+        <a href="#" class="nav-item" data-route="shorts">
+          <i class="ph-fill ph-play-circle"></i>
+          <span>Shorts</span>
+        </a>
         <a href="#" class="nav-item" data-route="subscriptions">
           <i class="ph-fill ph-youtube-logo"></i>
           <span>Subscriptions</span>
@@ -244,6 +248,26 @@
                   <i class="ph-fill ph-corners-out"></i>
                 </button>
               </div>
+            </div>
+          </div>
+
+          <!-- Ad Overlay -->
+          <div class="ad-overlay" id="adOverlay" style="display: none;">
+            <div class="ad-container">
+              <div class="ad-badge">Ad</div>
+              <div class="ad-content">
+                <p class="ad-text">Advertisement</p>
+                <h3 class="ad-title">Check out this great content!</h3>
+              </div>
+              <div class="ad-controls">
+                <span class="ad-timer" id="adTimer">5</span>
+                <button class="ad-skip-btn" id="adSkipBtn" disabled>
+                  Skip Ad <i class="ph-fill ph-skip-forward"></i>
+                </button>
+              </div>
+              <button class="ad-mute-btn" id="adMuteBtn">
+                <i class="ph-fill ph-speaker-high"></i>
+              </button>
             </div>
           </div>
         </div>
@@ -1052,6 +1076,17 @@
       </div>
       <div class="video-grid" id="trendingGrid">
         <!-- Trending videos will be loaded here -->
+      </div>
+    </div>
+
+    <!-- Shorts Page -->
+    <div class="shorts-page" id="shortsPage" style="display: none;">
+      <div class="shorts-header">
+        <h1><i class="ph-fill ph-play-circle"></i> Shorts</h1>
+        <p>Short-form videos</p>
+      </div>
+      <div class="shorts-grid" id="shortsGrid">
+        <!-- Shorts will be loaded here -->
       </div>
     </div>
   </div>

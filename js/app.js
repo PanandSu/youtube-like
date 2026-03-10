@@ -68,6 +68,7 @@ const likedVideosPage = document.getElementById('likedVideosPage');
 const savedVideosPage = document.getElementById('savedVideosPage');
 const subscriptionsPage = document.getElementById('subscriptionsPage');
 const trendingPage = document.getElementById('trendingPage');
+const shortsPage = document.getElementById('shortsPage');
 const playlistPage = document.getElementById('playlistPage');
 
 // Player elements
@@ -154,6 +155,13 @@ let appCurrentCategory = 'all';
 let appCurrentDuration = 'all';
 let appSearchQuery = '';
 let currentRoute = 'home';
+
+// Ad state
+let isAdPlaying = false;
+let adCountdown = 5;
+let adInterval = null;
+let adMuted = false;
+const AD_SKIP_TIME = 5; // Seconds until ad can be skipped
 
 // Initialize app
 async function init() {
@@ -1754,6 +1762,7 @@ function handleNavigation(route) {
   savedVideosPage.style.display = 'none';
   subscriptionsPage.style.display = 'none';
   trendingPage.style.display = 'none';
+  shortsPage.style.display = 'none';
 
   // Show selected page
   switch (route) {
@@ -1768,6 +1777,9 @@ function handleNavigation(route) {
       break;
     case 'trending':
       renderTrendingPage();
+      break;
+    case 'shorts':
+      renderShortsPage();
       break;
     case 'subscriptions':
       renderSubscriptionsPage();
@@ -1841,6 +1853,58 @@ function renderTrendingPage() {
         const videoId = card.dataset.videoId;
         openVideoPlayer(videoId);
       }
+    });
+  });
+
+  container.style.display = 'block';
+}
+
+// Render shorts page
+function renderShortsPage() {
+  const grid = document.getElementById('shortsGrid');
+  const container = document.getElementById('shortsPage');
+
+  // Filter videos that would work well as shorts (shorter duration)
+  const shorts = videos.filter(v => {
+    const durationSecs = parseVideoDuration(v.duration);
+    return durationSecs <= 180; // 3 minutes or less
+  });
+
+  // If not enough short videos, duplicate and modify some
+  let shortsToShow = [...shorts];
+  if (shortsToShow.length < 8) {
+    const additional = shorts.slice(0, 8 - shortsToShow.length).map(v => ({
+      ...v,
+      id: v.id + '_short',
+      title: v.title.substring(0, 50) + (v.title.length > 50 ? '...' : '')
+    }));
+    shortsToShow = [...shortsToShow, ...additional];
+  }
+
+  grid.innerHTML = shortsToShow.map(video => `
+    <article class="short-card" data-video-id="${video.id}">
+      <div class="short-thumbnail">
+        <img src="${video.thumbnail}" alt="${video.title}" loading="lazy">
+        <span class="short-duration">${video.duration}</span>
+      </div>
+      <div class="short-info">
+        <h3 class="short-title">${video.title}</h3>
+        <div class="short-meta">
+          <span class="short-views">
+            <i class="ph-fill ph-eye"></i>
+            ${utils.formatNumber(video.views)}
+          </span>
+          <span>${video.channel.name}</span>
+        </div>
+      </div>
+    </article>
+  `).join('');
+
+  // Add click handlers
+  grid.querySelectorAll('.short-card').forEach(card => {
+    card.addEventListener('click', () => {
+      const videoId = card.dataset.videoId;
+      openVideoPlayer(videoId);
     });
   });
 
@@ -3059,6 +3123,18 @@ function setupPlayerControls() {
     utils.showToast(loopEnabled ? 'Loop enabled' : 'Loop disabled');
   });
 
+  // Ad controls
+  const adSkipBtn = document.getElementById('adSkipBtn');
+  const adMuteBtn = document.getElementById('adMuteBtn');
+
+  if (adSkipBtn) {
+    adSkipBtn.addEventListener('click', skipAd);
+  }
+
+  if (adMuteBtn) {
+    adMuteBtn.addEventListener('click', toggleAdMute);
+  }
+
   // Captions/Subtitles
   const captionsBtn = document.getElementById('captionsBtn');
   let captionsEnabled = false;
@@ -3519,6 +3595,69 @@ function renderTranscript(transcript) {
   });
 }
 
+// Show skippable ad
+function showAd() {
+  const adOverlay = document.getElementById('adOverlay');
+  const adTimer = document.getElementById('adTimer');
+  const adSkipBtn = document.getElementById('adSkipBtn');
+  const adMuteBtn = document.getElementById('adMuteBtn');
+
+  if (!adOverlay) return;
+
+  isAdPlaying = true;
+  adCountdown = AD_SKIP_TIME;
+  adTimer.textContent = adCountdown;
+  adSkipBtn.disabled = true;
+
+  // Show ad overlay
+  adOverlay.style.display = 'flex';
+
+  // Pause main video
+  videoElement.pause();
+  isPlaying = false;
+
+  // Start countdown
+  adInterval = setInterval(() => {
+    adCountdown--;
+    adTimer.textContent = adCountdown;
+
+    if (adCountdown <= 0) {
+      adSkipBtn.disabled = false;
+      adTimer.textContent = '';
+    }
+  }, 1000);
+}
+
+// Skip ad
+function skipAd() {
+  const adOverlay = document.getElementById('adOverlay');
+
+  if (!isAdPlaying) return;
+
+  isAdPlaying = false;
+  clearInterval(adInterval);
+
+  if (adOverlay) {
+    adOverlay.style.display = 'none';
+  }
+
+  // Resume main video
+  videoElement.play();
+  isPlaying = true;
+  playPauseBtn.innerHTML = '<i class="ph-fill ph-pause"></i>';
+}
+
+// Toggle ad mute
+function toggleAdMute() {
+  adMuted = !adMuted;
+  const adMuteBtn = document.getElementById('adMuteBtn');
+  if (adMuteBtn) {
+    adMuteBtn.innerHTML = adMuted
+      ? '<i class="ph-fill ph-speaker-x"></i>'
+      : '<i class="ph-fill ph-speaker-high"></i>';
+  }
+}
+
 function togglePlay() {
   if (isPlaying) {
     videoElement.pause();
@@ -3560,6 +3699,18 @@ function openVideoPlayer(videoId) {
   components.renderRecommendations(videoId);
   components.renderComments(window.mockData.comments);
 
+  // Show ad (30% chance, not for shorts)
+  const durationSecs = parseVideoDuration(appCurrentVideo.duration);
+  if (durationSecs > 60 && Math.random() < 0.3) {
+    // Show ad overlay but don't auto-play video yet
+    showAd();
+  } else {
+    // Auto-play
+    videoElement.play();
+    isPlaying = true;
+    playPauseBtn.innerHTML = '<i class="ph-fill ph-pause"></i>';
+  }
+
   // Update like/save state based on user
   if (user) {
     const isLiked = auth.isVideoLiked(videoId);
@@ -3571,11 +3722,6 @@ function openVideoPlayer(videoId) {
     likeBtnEl.classList.toggle('active', isLiked);
     saveBtnEl.classList.toggle('active', isSaved);
   }
-
-  // Auto-play
-  videoElement.play();
-  isPlaying = true;
-  playPauseBtn.innerHTML = '<i class="ph-fill ph-pause"></i>';
 
   // Restore playback position if available (URL timestamp takes priority over saved position)
   let seekTime = 0;
