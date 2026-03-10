@@ -144,7 +144,7 @@ let currentEditingVideoId = null;
 
 // State
 let isPlaying = false;
-let currentPlaybackSpeed = 1;
+let currentPlaybackSpeed = parseFloat(localStorage.getItem('videoshare_playback_speed')) || 1;
 let currentVolume = 1;
 let isMuted = false;
 let selectedFile = null;
@@ -2896,6 +2896,12 @@ async function handleUpload() {
 
 // Player controls
 function setupPlayerControls() {
+  // Initialize playback speed from saved preference
+  videoElement.playbackRate = currentPlaybackSpeed;
+  playbackSpeedBtn.querySelector('span').textContent = currentPlaybackSpeed + 'x';
+  currentSpeedIndex = utils.playbackSpeeds.indexOf(currentPlaybackSpeed);
+  if (currentSpeedIndex === -1) currentSpeedIndex = 2; // Default to 1x
+
   playPauseBtn.addEventListener('click', togglePlay);
 
   volumeBtn.addEventListener('click', () => {
@@ -2990,6 +2996,7 @@ function setupPlayerControls() {
     currentPlaybackSpeed = utils.playbackSpeeds[currentSpeedIndex];
     videoElement.playbackRate = currentPlaybackSpeed;
     playbackSpeedBtn.querySelector('span').textContent = currentPlaybackSpeed + 'x';
+    localStorage.setItem('videoshare_playback_speed', currentPlaybackSpeed);
   });
 
   // Quality selection
