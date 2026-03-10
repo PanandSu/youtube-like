@@ -114,6 +114,7 @@ const editVideoDescription = document.getElementById('editVideoDescription');
 const editVideoCategory = document.getElementById('editVideoCategory');
 const editVideoTags = document.getElementById('editVideoTags');
 const editVideoVisibility = document.getElementById('editVideoVisibility');
+const editVideoThumbnail = document.getElementById('editVideoThumbnail');
 const editTitleCount = document.getElementById('editTitleCount');
 const editDescCount = document.getElementById('editDescCount');
 const deleteConfirmModal = document.getElementById('deleteConfirmModal');
@@ -572,6 +573,24 @@ function setupEventListeners() {
 
   submitUpload.addEventListener('click', handleUpload);
 
+  // Thumbnail URL preview
+  const thumbnailUrlInput = document.getElementById('thumbnailUrlInput');
+  const thumbnailPreviewImg = document.getElementById('thumbnailPreviewImg');
+  const thumbnailPlaceholder = document.getElementById('thumbnailPlaceholder');
+
+  if (thumbnailUrlInput) {
+    thumbnailUrlInput.addEventListener('input', () => {
+      if (thumbnailUrlInput.value) {
+        thumbnailPreviewImg.src = thumbnailUrlInput.value;
+        thumbnailPreviewImg.style.display = 'block';
+        thumbnailPlaceholder.style.display = 'none';
+      } else {
+        thumbnailPreviewImg.style.display = 'none';
+        thumbnailPlaceholder.style.display = 'flex';
+      }
+    });
+  }
+
   // Auth event listeners
   setupAuthEventListeners();
 
@@ -679,6 +698,21 @@ function setupEventListeners() {
         hideVideoOptionsMenu();
         showToast(`Visibility changed to ${video.visibility}`, 'success');
       }
+    });
+  }
+
+  // Report video button
+  const reportVideoBtn = document.getElementById('reportVideoBtn');
+  if (reportVideoBtn) {
+    reportVideoBtn.addEventListener('click', () => {
+      hideVideoOptionsMenu();
+      const reported = JSON.parse(localStorage.getItem('videoshare_reports') || '[]');
+      reported.push({
+        videoId: videoOptionsMenu.dataset.videoId,
+        reportedAt: new Date().toISOString()
+      });
+      localStorage.setItem('videoshare_reports', JSON.stringify(reported));
+      showToast('Video has been reported. Thank you for your feedback!');
     });
   }
 
@@ -2028,6 +2062,7 @@ function openVideoEditModal(videoId) {
   editVideoCategory.value = video.category || 'all';
   editVideoTags.value = video.tags ? video.tags.join(', ') : '';
   editVideoVisibility.value = video.visibility || 'public';
+  editVideoThumbnail.value = video.thumbnail || '';
 
   // Update character counts
   editTitleCount.textContent = editVideoTitle.value.length;
@@ -2056,6 +2091,9 @@ function saveVideoEdits() {
   videos[videoIndex].category = editVideoCategory.value;
   videos[videoIndex].tags = editVideoTags.value.split(',').map(t => t.trim()).filter(Boolean);
   videos[videoIndex].visibility = editVideoVisibility.value;
+  if (editVideoThumbnail.value) {
+    videos[videoIndex].thumbnail = editVideoThumbnail.value;
+  }
 
   // Save to localStorage
   localStorage.setItem('videoshare_videos', JSON.stringify(videos));
@@ -2193,6 +2231,73 @@ async function loadVideos() {
   await utils.simulateNetworkDelay();
   const filteredVideos = utils.filterVideos(videos, appCurrentCategory, appSearchQuery);
   components.renderVideoGrid(filteredVideos);
+
+  // Render continue watching section if user is logged in
+  renderContinueWatching();
+}
+
+// Render continue watching section
+function renderContinueWatching() {
+  const continueSection = document.getElementById('continueWatchingSection');
+  const continueGrid = document.getElementById('continueWatchingGrid');
+  const user = auth.getCurrentUser();
+
+  if (!user || !user.watchHistory || user.watchHistory.length === 0 || appSearchQuery || appCurrentCategory !== 'all') {
+    continueSection.style.display = 'none';
+    return;
+  }
+
+  // Get videos that have watch progress (not completed)
+  const continueVideos = user.watchHistory
+    .filter(h => h.lastPosition && h.lastPosition > 0)
+    .map(h => {
+      const video = videos.find(v => v.id === h.videoId);
+      if (!video) return null;
+      const duration = parseVideoDuration(video.duration);
+      const progress = (h.lastPosition / duration) * 100;
+      // Only show if less than 95% watched
+      if (progress >= 95) return null;
+      return { ...video, lastPosition: h.lastPosition, progress };
+    })
+    .filter(Boolean)
+    .slice(0, 6);
+
+  if (continueVideos.length === 0) {
+    continueSection.style.display = 'none';
+    return;
+  }
+
+  continueSection.style.display = 'block';
+  continueGrid.innerHTML = continueVideos.map(video => `
+    <article class="video-card" data-video-id="${video.id}">
+      <div class="video-thumbnail">
+        <img src="${video.thumbnail}" alt="${video.title}" loading="lazy">
+        <span class="video-duration">${video.duration}</span>
+        <div class="watch-progress-bar">
+          <div class="watch-progress" style="width: ${video.progress}%"></div>
+        </div>
+      </div>
+      <div class="video-details">
+        <div class="video-avatar">
+          <img src="${video.channel.avatar}" alt="${video.channel.name}">
+        </div>
+        <div class="video-info">
+          <h3 class="video-title">${video.title}</h3>
+          <a href="#" class="video-channel" data-channel-id="${video.channel.id}">${video.channel.name}</a>
+          <div class="video-meta">
+            <span>${Math.round(video.progress)}% watched</span>
+          </div>
+        </div>
+      </div>
+    </article>
+  `).join('');
+
+  // Add click handlers
+  continueGrid.querySelectorAll('.video-card').forEach(card => {
+    card.addEventListener('click', () => {
+      openVideoPlayer(card.dataset.videoId);
+    });
+  });
 }
 
 // File selection
@@ -2221,6 +2326,18 @@ function resetUploadForm() {
   document.getElementById('videoDescriptionInput').value = '';
   document.getElementById('videoCategoryInput').value = '';
   document.getElementById('videoTagsInput').value = '';
+  document.getElementById('thumbnailUrlInput').value = '';
+
+  // Reset thumbnail preview
+  const thumbnailPreviewImg = document.getElementById('thumbnailPreviewImg');
+  const thumbnailPlaceholder = document.getElementById('thumbnailPlaceholder');
+  if (thumbnailPreviewImg) {
+    thumbnailPreviewImg.style.display = 'none';
+    thumbnailPreviewImg.src = '';
+  }
+  if (thumbnailPlaceholder) {
+    thumbnailPlaceholder.style.display = 'flex';
+  }
 }
 
 // Close modal
@@ -2235,11 +2352,20 @@ async function handleUpload() {
   const description = document.getElementById('videoDescriptionInput').value.trim();
   const category = document.getElementById('videoCategoryInput').value;
   const tags = document.getElementById('videoTagsInput').value.split(',').map(t => t.trim()).filter(Boolean);
+  const thumbnailUrl = document.getElementById('thumbnailUrlInput').value.trim();
 
   if (!title || !category) {
     utils.showToast('Please fill in required fields', 'error');
     return;
   }
+
+  // Default thumbnail if none provided
+  const defaultThumbnails = [
+    'https://images.unsplash.com/photo-1611162617474-5b21e879e113?w=640&h=360&fit=crop',
+    'https://images.unsplash.com/photo-1498050108023-c5249f4df085?w=640&h=360&fit=crop',
+    'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=640&h=360&fit=crop'
+  ];
+  const thumbnail = thumbnailUrl || defaultThumbnails[Math.floor(Math.random() * defaultThumbnails.length)];
 
   uploadForm.style.display = 'none';
   uploadPreview.style.display = 'none';
@@ -2258,7 +2384,7 @@ async function handleUpload() {
   const newVideo = {
     id: utils.generateId(),
     title,
-    thumbnail: 'https://images.unsplash.com/photo-1611162617474-5b21e879e113?w=640&h=360&fit=crop',
+    thumbnail: thumbnail,
     duration: '0:00',
     views: 0,
     uploadedAt: new Date(),
@@ -2759,6 +2885,14 @@ window.openVideoPlayer = openVideoPlayer;
 window.showHomePage = showHomePage;
 window.openChannelPage = openChannelPage;
 window.showVideoOptionsMenu = showVideoOptionsMenu;
+
+// Function to seek video to specific time (for chapters)
+window.seekToTime = function(time) {
+  const videoElement = document.getElementById('mainVideo');
+  if (videoElement && videoElement.duration) {
+    videoElement.currentTime = time;
+  }
+};
 
 // Initialize
 document.addEventListener('DOMContentLoaded', init);

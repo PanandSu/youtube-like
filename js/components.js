@@ -315,6 +315,78 @@ function updateVideoPlayerInfo(video) {
 
   const descEl = document.getElementById('videoDescription');
   descEl.querySelector('p').textContent = video.description;
+
+  // Render video chapters
+  renderVideoChapters(video);
+}
+
+// Render video chapters
+function renderVideoChapters(video) {
+  const chaptersSection = document.getElementById('videoChapters');
+  const chaptersList = document.getElementById('chaptersList');
+
+  // Generate default chapters for demo if none exist
+  let chapters = video.chapters || [];
+
+  // If no chapters, generate some based on video duration
+  if (chapters.length === 0 && video.duration) {
+    const durationSecs = parseVideoDuration(video.duration);
+    if (durationSecs > 60) {
+      chapters = [
+        { time: 0, title: 'Introduction', description: '' },
+        { time: Math.floor(durationSecs * 0.2), title: 'Main Content', description: '' },
+        { time: Math.floor(durationSecs * 0.5), title: 'Deep Dive', description: '' },
+        { time: Math.floor(durationSecs * 0.8), title: 'Conclusion', description: '' }
+      ];
+    }
+  }
+
+  if (chapters.length === 0) {
+    chaptersSection.style.display = 'none';
+    return;
+  }
+
+  chaptersSection.style.display = 'block';
+
+  chaptersList.innerHTML = chapters.map((chapter, index) => `
+    <div class="chapter-item" data-time="${chapter.time}">
+      <div class="chapter-thumbnail">
+        <img src="${video.thumbnail}" alt="Chapter thumbnail">
+        <span class="chapter-time">${formatTime(chapter.time)}</span>
+      </div>
+      <div class="chapter-info">
+        <span class="chapter-title">${chapter.title}</span>
+        ${chapter.description ? `<span class="chapter-description">${chapter.description}</span>` : ''}
+      </div>
+    </div>
+  `).join('');
+
+  // Add click handlers to seek to chapter
+  chaptersList.querySelectorAll('.chapter-item').forEach(item => {
+    item.addEventListener('click', () => {
+      const time = parseInt(item.dataset.time);
+      if (window.seekToTime) {
+        window.seekToTime(time);
+      }
+    });
+  });
+}
+
+function parseVideoDuration(duration) {
+  if (!duration) return 0;
+  const parts = duration.split(':');
+  if (parts.length === 2) {
+    return parseInt(parts[0]) * 60 + parseInt(parts[1]);
+  } else if (parts.length === 3) {
+    return parseInt(parts[0]) * 3600 + parseInt(parts[1]) * 60 + parseInt(parts[2]);
+  }
+  return 0;
+}
+
+function formatTime(seconds) {
+  const mins = Math.floor(seconds / 60);
+  const secs = seconds % 60;
+  return `${mins}:${secs.toString().padStart(2, '0')}`;
 }
 
 // Export components
