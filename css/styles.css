@@ -534,6 +534,50 @@ img {
   gap: 20px;
 }
 
+/* Infinite Scroll */
+.infinite-scroll-spinner {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 24px;
+  color: var(--text-secondary);
+  font-size: 14px;
+}
+
+.infinite-scroll-spinner .spinner {
+  width: 24px;
+  height: 24px;
+  border: 3px solid var(--border-color);
+  border-top-color: var(--accent-primary);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.load-more-btn {
+  display: block;
+  margin: 32px auto;
+  padding: 12px 32px;
+  background: var(--bg-tertiary);
+  color: var(--text-primary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.load-more-btn:hover {
+  background: var(--surface);
+  border-color: var(--accent-primary);
+  color: var(--accent-primary);
+}
+
 /* Continue Watching Section */
 .continue-watching-section {
   margin-bottom: 32px;
@@ -1180,6 +1224,78 @@ body.theater-mode .recommendations {
   font-size: 12px;
   color: var(--text-secondary);
   margin-top: 2px;
+}
+
+/* Video Transcript */
+.transcript-section {
+  padding: 16px;
+  background: var(--bg-secondary);
+  border-radius: var(--radius-md);
+  margin-top: 16px;
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.transcript-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.transcript-header h3 {
+  font-size: 16px;
+  color: var(--text-primary);
+}
+
+.transcript-close {
+  background: none;
+  border: none;
+  color: var(--text-secondary);
+  cursor: pointer;
+  font-size: 20px;
+  padding: 4px;
+}
+
+.transcript-close:hover {
+  color: var(--text-primary);
+}
+
+.transcript-content {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.transcript-line {
+  display: flex;
+  gap: 12px;
+  padding: 8px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.transcript-line:hover {
+  background: var(--surface);
+}
+
+.transcript-line.active {
+  background: var(--bg-tertiary);
+  border-left: 3px solid var(--accent-primary);
+}
+
+.transcript-time {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  color: var(--accent-primary);
+  min-width: 50px;
+}
+
+.transcript-text {
+  font-size: 14px;
+  color: var(--text-primary);
+  line-height: 1.5;
 }
 
 /* Comments */
@@ -2703,6 +2819,111 @@ body.theater-mode .recommendations {
   padding: 24px 0;
 }
 
+/* Channel Playlists */
+.playlists-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 20px;
+}
+
+.playlist-card {
+  background: var(--bg-tertiary);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  cursor: pointer;
+  transition: transform var(--transition-normal), box-shadow var(--transition-normal);
+}
+
+.playlist-card:hover {
+  transform: scale(1.02);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+}
+
+.playlist-thumbnail {
+  aspect-ratio: 16 / 9;
+  background: var(--surface);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 48px;
+  color: var(--text-secondary);
+}
+
+.playlist-info {
+  padding: 12px;
+}
+
+.playlist-info h3 {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 4px;
+}
+
+.playlist-info p {
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+/* Channel About */
+.channel-about {
+  padding: 20px;
+  background: var(--bg-tertiary);
+  border-radius: var(--radius-md);
+}
+
+.channel-about h3 {
+  font-size: 18px;
+  margin-bottom: 16px;
+  color: var(--text-primary);
+}
+
+.channel-about p {
+  margin-bottom: 8px;
+  color: var(--text-secondary);
+}
+
+.channel-about strong {
+  color: var(--text-primary);
+}
+
+/* Channel Analytics */
+.channel-analytics {
+  padding: 20px;
+}
+
+.channel-analytics h3 {
+  font-size: 18px;
+  margin-bottom: 20px;
+  color: var(--text-primary);
+}
+
+.analytics-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 16px;
+}
+
+.analytics-card {
+  background: var(--bg-tertiary);
+  border-radius: var(--radius-md);
+  padding: 20px;
+  text-align: center;
+}
+
+.analytics-value {
+  display: block;
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--accent-primary);
+  margin-bottom: 8px;
+}
+
+.analytics-label {
+  font-size: 14px;
+  color: var(--text-secondary);
+}
+
 /* ============================================
    History Page
    ============================================ */
@@ -3300,4 +3521,34 @@ body.theater-mode .recommendations {
     flex: 1;
     text-align: center;
   }
+}
+
+/* Scroll to Top Button */
+.scroll-to-top {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: var(--accent-primary);
+  color: var(--bg-primary);
+  border: none;
+  cursor: pointer;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  z-index: 999;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.scroll-to-top:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
+}
+
+.scroll-to-top.visible {
+  display: flex;
 }

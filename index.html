@@ -250,7 +250,10 @@
                 <i class="ph-fill ph-bookmark-simple"></i>
                 <span>Save</span>
               </button>
-            </div>
+              <button class="action-btn" id="transcriptBtn">
+                <i class="ph ph-text-aa"></i>
+                <span>Transcript</span>
+              </button>
           </div>
         </div>
 
@@ -275,6 +278,17 @@
         <div class="video-chapters" id="videoChapters" style="display: none;">
           <h3>Chapters</h3>
           <div class="chapters-list" id="chaptersList">
+          </div>
+        </div>
+
+        <div class="transcript-section" id="transcriptSection" style="display: none;">
+          <div class="transcript-header">
+            <h3>Transcript</h3>
+            <button class="transcript-close" id="transcriptCloseBtn">
+              <i class="ph ph-x"></i>
+            </button>
+          </div>
+          <div class="transcript-content" id="transcriptContent">
           </div>
         </div>
 
@@ -977,6 +991,11 @@
       </div>
     </div>
   </div>
+
+  <!-- Scroll to Top Button -->
+  <button class="scroll-to-top" id="scrollToTopBtn" title="Scroll to top">
+    <i class="ph-fill ph-arrow-up"></i>
+  </button>
 
   <script src="js/data.js"></script>
   <script src="js/utils.js"></script>

@@ -54,6 +54,13 @@ const notificationsDropdown = document.getElementById('notificationsDropdown');
 const themeToggle = document.getElementById('themeToggle');
 let currentTheme = localStorage.getItem('videoshare_theme') || 'dark';
 
+// Pagination for infinite scroll
+const VIDEOS_PER_PAGE = 12;
+let currentPage = 1;
+let isLoadingMore = false;
+let hasMoreVideos = true;
+let allFilteredVideos = [];
+
 // Page elements
 const channelPage = document.getElementById('channelPage');
 const historyPage = document.getElementById('historyPage');
@@ -167,6 +174,7 @@ async function init() {
   setupPlayerControls();
   setupKeyboardShortcuts();
   setupPlaylistEventListeners();
+  setupInfiniteScroll();
   updateAuthUI();
   checkURLParams();
 }
@@ -911,6 +919,118 @@ function setupEventListeners() {
 
   // Setup comment reply handlers
   setupCommentEventListeners();
+
+  // Channel tabs
+  const channelTabs = document.querySelectorAll('.channel-tab');
+  channelTabs.forEach(tab => {
+    tab.addEventListener('click', () => {
+      const channelId = document.getElementById('channelPageAvatar')?.closest('.channel-page')?.querySelector('.channel-tabs')?.dataset?.channelId;
+      if (!tab.dataset.tab) return;
+
+      // Update active tab
+      channelTabs.forEach(t => t.classList.remove('active'));
+      tab.classList.add('active');
+
+      // Load tab content
+      loadChannelTab(tab.dataset.tab, channelId);
+    });
+  });
+}
+
+// Load channel tab content
+function loadChannelTab(tabName, channelId) {
+  const content = document.getElementById('channelContent');
+  const user = auth.getCurrentUser();
+
+  // Get channel info
+  let channel = null;
+  if (user && user.channel && user.channel.id === channelId) {
+    channel = user.channel;
+    channel.avatar = user.avatar;
+    channel.isOwner = true;
+  } else {
+    const video = videos.find(v => v.channel.id === channelId);
+    if (video) {
+      channel = { ...video.channel, isOwner: false };
+    }
+  }
+
+  if (!channel) return;
+
+  switch (tabName) {
+    case 'videos':
+      const channelVideos = videos.filter(v => v.channel.id === channelId);
+      if (channelVideos.length === 0) {
+        content.innerHTML = '<div class="empty-state" style="display: flex;"><i class="ph-fill ph-video-camera-slash"></i><h3>No videos yet</h3><p>This channel has not uploaded any videos</p></div>';
+      } else {
+        content.innerHTML = `<div class="video-grid">${channelVideos.map(components.renderVideoCard).join('')}</div>`;
+        content.querySelectorAll('.video-card').forEach(card => {
+          card.addEventListener('click', () => {
+            openVideoPlayer(card.dataset.videoId);
+          });
+        });
+      }
+      break;
+
+    case 'playlists':
+      const userPlaylists = auth.getPlaylists();
+      const channelPlaylists = userPlaylists.filter(p => p.channelId === channelId);
+      if (channelPlaylists.length === 0) {
+        content.innerHTML = '<div class="empty-state" style="display: flex;"><i class="ph-fill ph-list-chevron"></i><h3>No playlists yet</h3><p>This channel has not created any playlists</p></div>';
+      } else {
+        content.innerHTML = `<div class="playlists-grid">${channelPlaylists.map(playlist => `
+          <div class="playlist-card" data-playlist-id="${playlist.id}">
+            <div class="playlist-thumbnail">
+              <i class="ph-fill ph-list-chevron"></i>
+            </div>
+            <div class="playlist-info">
+              <h3>${playlist.name}</h3>
+              <p>${playlist.videos.length} videos</p>
+            </div>
+          </div>
+        `).join('')}</div>`;
+      }
+      break;
+
+    case 'about':
+      content.innerHTML = `
+        <div class="channel-about">
+          <h3>Details</h3>
+          <p><strong>Channel:</strong> ${channel.name}</p>
+          <p><strong>Subscribers:</strong> ${utils.formatSubscribers(channel.subscribers || 0)}</p>
+          <p><strong>Total views:</strong> ${utils.formatNumber(channel.totalViews || 0)}</p>
+          <p><strong>Joined:</strong> ${channel.joinedDate ? new Date(channel.joinedDate).toLocaleDateString() : 'Unknown'}</p>
+          ${channel.description ? `<p><strong>Description:</strong></p><p>${channel.description}</p>` : ''}
+        </div>
+      `;
+      break;
+
+    case 'analytics':
+      content.innerHTML = `
+        <div class="channel-analytics">
+          <h3>Channel Analytics</h3>
+          <div class="analytics-cards">
+            <div class="analytics-card">
+              <span class="analytics-value">${utils.formatNumber(channel.totalViews || 0)}</span>
+              <span class="analytics-label">Total views</span>
+            </div>
+            <div class="analytics-card">
+              <span class="analytics-value">${utils.formatSubscribers(channel.subscribers || 0)}</span>
+              <span class="analytics-label">Subscribers</span>
+            </div>
+            <div class="analytics-card">
+              <span class="analytics-value">${videos.filter(v => v.channel.id === channelId).length}</span>
+              <span class="analytics-label">Total videos</span>
+            </div>
+          </div>
+        </div>
+      `;
+      break;
+
+    case 'community':
+      content.innerHTML = '<div class="empty-state" style="display: flex;"><i class="ph-fill ph-chat-teardrop-text"></i><h3>No community posts</h3><p>This channel has not posted any updates</p></div>';
+      break;
+  }
 }
 
 // Setup comment event listeners
@@ -1942,6 +2062,12 @@ function openChannelPage(channelId) {
     });
   }
 
+  // Set channel ID on tabs for tab switching
+  const channelTabs = document.querySelector('.channel-tabs');
+  if (channelTabs) {
+    channelTabs.dataset.channelId = channelId;
+  }
+
   channelPage.style.display = 'block';
   currentRoute = 'channel';
 }
@@ -2229,11 +2355,158 @@ function renderNotifications() {
 // Load and render videos
 async function loadVideos() {
   await utils.simulateNetworkDelay();
-  const filteredVideos = utils.filterVideos(videos, appCurrentCategory, appSearchQuery);
-  components.renderVideoGrid(filteredVideos);
+
+  // Reset pagination
+  currentPage = 1;
+  allFilteredVideos = utils.filterVideos(videos, appCurrentCategory, appSearchQuery);
+  hasMoreVideos = allFilteredVideos.length > VIDEOS_PER_PAGE;
+
+  const videosToRender = allFilteredVideos.slice(0, VIDEOS_PER_PAGE);
+  components.renderVideoGrid(videosToRender);
+
+  // Add or remove load more button
+  updateLoadMoreButton();
 
   // Render continue watching section if user is logged in
   renderContinueWatching();
+}
+
+// Load more videos (for infinite scroll)
+async function loadMoreVideos() {
+  if (isLoadingMore || !hasMoreVideos) return;
+
+  isLoadingMore = true;
+  showLoadingSpinner();
+
+  await utils.simulateNetworkDelay(300);
+
+  currentPage++;
+  const startIndex = (currentPage - 1) * VIDEOS_PER_PAGE;
+  const endIndex = startIndex + VIDEOS_PER_PAGE;
+  const newVideos = allFilteredVideos.slice(startIndex, endIndex);
+
+  // Append new videos to grid
+  const grid = document.getElementById('videoGrid');
+  const existingCards = grid.querySelectorAll('.video-card');
+  const existingCount = existingCards.length;
+
+  newVideos.forEach((video, index) => {
+    const cardHtml = components.renderVideoCard(video);
+    const tempDiv = document.createElement('div');
+    tempDiv.innerHTML = cardHtml;
+    const card = tempDiv.firstElementChild;
+    grid.appendChild(card);
+
+    // Add click handlers
+    card.addEventListener('click', (e) => {
+      if (!e.target.closest('.video-menu')) {
+        openVideoPlayer(video.id);
+      }
+    });
+
+    const menuBtn = card.querySelector('.video-menu');
+    if (menuBtn) {
+      menuBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        showVideoOptionsMenu(video.id, e);
+      });
+    }
+
+    const channelLink = card.querySelector('.video-channel');
+    if (channelLink) {
+      channelLink.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        openChannelPage(video.channel.id);
+      });
+    }
+  });
+
+  hasMoreVideos = endIndex < allFilteredVideos.length;
+  updateLoadMoreButton();
+
+  hideLoadingSpinner();
+  isLoadingMore = false;
+}
+
+// Show loading spinner
+function showLoadingSpinner() {
+  let spinner = document.getElementById('infiniteScrollSpinner');
+  if (!spinner) {
+    spinner = document.createElement('div');
+    spinner.id = 'infiniteScrollSpinner';
+    spinner.className = 'infinite-scroll-spinner';
+    spinner.innerHTML = '<div class="spinner"></div><span>Loading more videos...</span>';
+    const videoGrid = document.getElementById('videoGrid');
+    videoGrid.parentNode.insertBefore(spinner, videoGrid.nextSibling);
+  }
+  spinner.style.display = 'flex';
+}
+
+// Hide loading spinner
+function hideLoadingSpinner() {
+  const spinner = document.getElementById('infiniteScrollSpinner');
+  if (spinner) {
+    spinner.style.display = 'none';
+  }
+}
+
+// Update load more button visibility
+function updateLoadMoreButton() {
+  let loadMoreBtn = document.getElementById('loadMoreBtn');
+  if (!loadMoreBtn) {
+    loadMoreBtn = document.createElement('button');
+    loadMoreBtn.id = 'loadMoreBtn';
+    loadMoreBtn.className = 'load-more-btn';
+    loadMoreBtn.textContent = 'Load More';
+    loadMoreBtn.addEventListener('click', loadMoreVideos);
+
+    const gridContainer = document.querySelector('.video-grid-container');
+    if (gridContainer) {
+      gridContainer.parentNode.insertBefore(loadMoreBtn, gridContainer.nextSibling);
+    }
+  }
+
+  loadMoreBtn.style.display = hasMoreVideos ? 'block' : 'none';
+}
+
+// Infinite scroll handler
+function setupInfiniteScroll() {
+  let scrollTimeout;
+
+  window.addEventListener('scroll', () => {
+    if (scrollTimeout) {
+      cancelAnimationFrame(scrollTimeout);
+    }
+
+    scrollTimeout = requestAnimationFrame(() => {
+      const scrollPosition = window.innerHeight + window.scrollY;
+      const documentHeight = document.documentElement.scrollHeight;
+
+      // Load more when within 500px of bottom
+      if (documentHeight - scrollPosition < 500) {
+        loadMoreVideos();
+      }
+
+      // Show/hide scroll to top button
+      const scrollToTopBtn = document.getElementById('scrollToTopBtn');
+      if (scrollToTopBtn) {
+        if (window.scrollY > 300) {
+          scrollToTopBtn.classList.add('visible');
+        } else {
+          scrollToTopBtn.classList.remove('visible');
+        }
+      }
+    });
+  });
+
+  // Scroll to top button click handler
+  const scrollToTopBtn = document.getElementById('scrollToTopBtn');
+  if (scrollToTopBtn) {
+    scrollToTopBtn.addEventListener('click', () => {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+  }
 }
 
 // Render continue watching section
@@ -2739,6 +3012,42 @@ function setupPlayerControls() {
     openSaveToPlaylistModal(appCurrentVideo.id);
   });
 
+  // Transcript button
+  const transcriptBtn = document.getElementById('transcriptBtn');
+  const transcriptSection = document.getElementById('transcriptSection');
+  const transcriptContent = document.getElementById('transcriptContent');
+  const transcriptCloseBtn = document.getElementById('transcriptCloseBtn');
+
+  if (transcriptBtn) {
+    transcriptBtn.addEventListener('click', () => {
+      if (!appCurrentVideo) return;
+
+      // Generate or get transcript
+      const transcript = generateTranscript(appCurrentVideo);
+
+      if (transcript.length === 0) {
+        utils.showToast('No transcript available for this video');
+        return;
+      }
+
+      // Render transcript
+      renderTranscript(transcript);
+
+      // Show/hide transcript section
+      if (transcriptSection.style.display === 'block') {
+        transcriptSection.style.display = 'none';
+      } else {
+        transcriptSection.style.display = 'block';
+      }
+    });
+  }
+
+  if (transcriptCloseBtn) {
+    transcriptCloseBtn.addEventListener('click', () => {
+      transcriptSection.style.display = 'none';
+    });
+  }
+
   subscribeBtn.addEventListener('click', () => {
     const user = auth.getCurrentUser();
     if (!user) {
@@ -2760,6 +3069,102 @@ function setupPlayerControls() {
       appCurrentVideo.channel.subscribers++;
     }
     components.updateVideoPlayerInfo(appCurrentVideo);
+  });
+}
+
+// Generate mock transcript for a video
+function generateTranscript(video) {
+  // Check if video has transcript data
+  if (video.transcript && video.transcript.length > 0) {
+    return video.transcript;
+  }
+
+  // Generate mock transcript based on video title and description
+  const title = video.title || '';
+  const description = video.description || '';
+
+  // Generate timestamps based on video duration
+  const durationSecs = parseVideoDuration(video.duration) || 300;
+  const lineCount = Math.min(Math.floor(durationSecs / 30), 20); // One line every 30 seconds, max 20 lines
+
+  const sampleLines = [
+    "Welcome back to another video!",
+    "Today we're going to be discussing an exciting topic.",
+    "Let's dive right into it.",
+    "First, let me show you something interesting.",
+    "As you can see here, this is really important.",
+    "Now, let's move on to the next part.",
+    "This is where things get interesting.",
+    "Let me explain this in more detail.",
+    "You might be wondering why this matters.",
+    "The key point here is quite simple.",
+    "Let's take a look at some examples.",
+    "Here's another thing to consider.",
+    "This is actually quite common in practice.",
+    "Now we can see the results clearly.",
+    "Let me demonstrate with a quick demo.",
+    "This is actually really cool once you try it.",
+    "The important thing to remember is.",
+    "In the next section, we'll cover.",
+    "Thanks for watching! Don't forget to like and subscribe.",
+    "Leave a comment below with your thoughts!"
+  ];
+
+  const transcript = [];
+  for (let i = 0; i < lineCount; i++) {
+    transcript.push({
+      time: i * 30,
+      text: sampleLines[i % sampleLines.length]
+    });
+  }
+
+  return transcript;
+}
+
+// Render transcript
+function renderTranscript(transcript) {
+  const transcriptContent = document.getElementById('transcriptContent');
+  if (!transcriptContent) return;
+
+  transcriptContent.innerHTML = transcript.map((line, index) => `
+    <div class="transcript-line" data-time="${line.time}" data-index="${index}">
+      <span class="transcript-time">${formatTime(line.time)}</span>
+      <span class="transcript-text">${line.text}</span>
+    </div>
+  `).join('');
+
+  // Add click handlers to seek to timestamp
+  transcriptContent.querySelectorAll('.transcript-line').forEach(line => {
+    line.addEventListener('click', () => {
+      const time = parseInt(line.dataset.time);
+      if (window.seekToTime) {
+        window.seekToTime(time);
+      } else if (videoElement) {
+        videoElement.currentTime = time;
+        videoElement.play();
+      }
+
+      // Highlight active line
+      transcriptContent.querySelectorAll('.transcript-line').forEach(l => l.classList.remove('active'));
+      line.classList.add('active');
+    });
+  });
+
+  // Update active line on timeupdate
+  videoElement.addEventListener('timeupdate', () => {
+    const currentTime = Math.floor(videoElement.currentTime);
+    transcriptContent.querySelectorAll('.transcript-line').forEach(line => {
+      const lineTime = parseInt(line.dataset.time);
+      const nextLine = transcriptContent.querySelector(`.transcript-line[data-index="${parseInt(line.dataset.index) + 1}"]`);
+      const nextTime = nextLine ? parseInt(nextLine.dataset.time) : Infinity;
+
+      if (currentTime >= lineTime && currentTime < nextTime) {
+        line.classList.add('active');
+        line.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      } else {
+        line.classList.remove('active');
+      }
+    });
   });
 }
 
