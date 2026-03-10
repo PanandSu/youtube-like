@@ -68,6 +68,7 @@ const likedVideosPage = document.getElementById('likedVideosPage');
 const savedVideosPage = document.getElementById('savedVideosPage');
 const subscriptionsPage = document.getElementById('subscriptionsPage');
 const trendingPage = document.getElementById('trendingPage');
+const playlistPage = document.getElementById('playlistPage');
 
 // Player elements
 const playPauseBtn = document.getElementById('playPauseBtn');
@@ -1981,6 +1982,75 @@ function renderSavedPage() {
   savedVideosPage.style.display = 'block';
 }
 
+// Open playlist page
+function openPlaylistPage(playlistId) {
+  const user = auth.getCurrentUser();
+  if (!user || !user.playlists) {
+    utils.showToast('Please sign in to view playlists');
+    return;
+  }
+
+  const playlist = user.playlists.find(p => p.id === playlistId);
+  if (!playlist) {
+    utils.showToast('Playlist not found');
+    return;
+  }
+
+  // Hide other pages
+  mainContent.style.display = 'none';
+  videoPlayerPage.classList.remove('active');
+  historyPage.style.display = 'none';
+  likedVideosPage.style.display = 'none';
+  savedVideosPage.style.display = 'none';
+  subscriptionsPage.style.display = 'none';
+  channelPage.style.display = 'none';
+
+  // Set playlist info
+  const playlistName = document.getElementById('playlistName');
+  const playlistMeta = document.getElementById('playlistMeta');
+  const playlistVideos = document.getElementById('playlistVideos');
+
+  playlistName.textContent = playlist.name;
+  playlistMeta.textContent = `${playlist.videos.length} videos`;
+
+  // Render playlist videos
+  const playlistVideoData = playlist.videos
+    .map(videoId => videos.find(v => v.id === videoId))
+    .filter(Boolean);
+
+  if (playlistVideoData.length === 0) {
+    playlistVideos.innerHTML = '<div class="empty-state" style="display: flex;"><i class="ph-fill ph-video-camera-slash"></i><h3>No videos in this playlist</h3></div>';
+  } else {
+    playlistVideos.innerHTML = playlistVideoData.map((video, index) => `
+      <div class="playlist-video-item" data-video-id="${video.id}">
+        <span class="video-number">${index + 1}</span>
+        <div class="video-thumbnail">
+          <img src="${video.thumbnail}" alt="${video.title}">
+          <span class="video-duration">${video.duration}</span>
+        </div>
+        <div class="video-info">
+          <div class="video-title">${video.title}</div>
+          <div class="video-channel">${video.channel.name}</div>
+        </div>
+      </div>
+    `).join('');
+
+    // Add click handlers
+    playlistVideos.querySelectorAll('.playlist-video-item').forEach(item => {
+      item.addEventListener('click', () => {
+        openVideoPlayer(item.dataset.videoId);
+      });
+    });
+  }
+
+  const playlistPage = document.getElementById('playlistPage');
+  if (playlistPage) {
+    playlistPage.style.display = 'block';
+  }
+
+  currentRoute = 'playlist';
+}
+
 // Open channel page
 function openChannelPage(channelId) {
   // Find channel (could be user channel or video channel)
@@ -3289,6 +3359,7 @@ window.addEventListener('popstate', () => {
 window.openVideoPlayer = openVideoPlayer;
 window.showHomePage = showHomePage;
 window.openChannelPage = openChannelPage;
+window.openPlaylistPage = openPlaylistPage;
 window.showVideoOptionsMenu = showVideoOptionsMenu;
 
 // Function to seek video to specific time (for chapters)
