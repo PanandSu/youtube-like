@@ -1,0 +1,13 @@
+# Test images and screenshots
+*.png
+!assets/*.png
+
+# Log files
+log/
+*.log
+
+# OS files
+.DS_Store
+
+# Playwright
+.playwright-mcp/

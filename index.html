@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>VideoShare - Share Your Moments</title>
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.0.3/src/regular/style.css">
+  <link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.0.3/src/fill/style.css">
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+  <div id="app">
+    <!-- Header -->
+    <header class="header">
+      <div class="header-left">
+        <button class="menu-toggle" id="menuToggle" aria-label="Toggle menu">
+          <i class="ph ph-list"></i>
+        </button>
+        <a href="#" class="logo" data-route="home">
+          <i class="ph-fill ph-film-slate"></i>
+          <span>VideoShare</span>
+        </a>
+      </div>
+
+      <div class="search-container">
+        <div class="search-wrapper">
+          <input type="text" class="search-input" id="searchInput" placeholder="Search videos...">
+          <button class="search-btn" id="searchBtn">
+            <i class="ph ph-magnifying-glass"></i>
+          </button>
+        </div>
+      </div>
+
+      <div class="header-actions">
+        <button class="upload-btn" id="uploadBtn">
+          <i class="ph-fill ph-video-camera"></i>
+          <span>Upload</span>
+        </button>
+        <button class="icon-btn notification-btn" id="notificationBtn">
+          <i class="ph ph-bell"></i>
+          <span class="notification-dot"></span>
+        </button>
+        <div class="user-avatar" id="userAvatar">
+          <img src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=100&h=100&fit=crop" alt="User">
+        </div>
+      </div>
+    </header>
+
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+      <nav class="sidebar-nav">
+        <a href="#" class="nav-item active" data-route="home">
+          <i class="ph-fill ph-house"></i>
+          <span>Home</span>
+        </a>
+        <a href="#" class="nav-item" data-route="explore">
+          <i class="ph-fill ph-compass"></i>
+          <span>Explore</span>
+        </a>
+        <a href="#" class="nav-item" data-route="subscriptions">
+          <i class="ph-fill ph-youtube-logo"></i>
+          <span>Subscriptions</span>
+        </a>
+        <div class="nav-divider"></div>
+        <a href="#" class="nav-item" data-route="library">
+          <i class="ph-fill ph-books"></i>
+          <span>Library</span>
+        </a>
+        <a href="#" class="nav-item" data-route="history">
+          <i class="ph-fill ph-clock-counter-clockwise"></i>
+          <span>History</span>
+        </a>
+        <a href="#" class="nav-item" data-route="liked">
+          <i class="ph-fill ph-heart"></i>
+          <span>Liked Videos</span>
+        </a>
+      </nav>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+      <!-- Categories Bar -->
+      <div class="categories-bar" id="categoriesBar">
+        <button class="category-chip active" data-category="all">All</button>
+        <button class="category-chip" data-category="gaming">Gaming</button>
+        <button class="category-chip" data-category="music">Music</button>
+        <button class="category-chip" data-category="tech">Tech</button>
+        <button class="category-chip" data-category="sports">Sports</button>
+        <button class="category-chip" data-category="cooking">Cooking</button>
+        <button class="category-chip" data-category="travel">Travel</button>
+        <button class="category-chip" data-category="comedy">Comedy</button>
+        <button class="category-chip" data-category="education">Education</button>
+      </div>
+
+      <!-- Video Grid -->
+      <section class="video-grid" id="videoGrid">
+        <!-- Videos will be injected here -->
+      </section>
+
+      <!-- Empty State (hidden by default) -->
+      <div class="empty-state" id="emptyState" style="display: none;">
+        <i class="ph-fill ph-video-camera-slash"></i>
+        <h3>No videos found</h3>
+        <p>Try adjusting your search or filters</p>
+      </div>
+    </main>
+
+    <!-- Video Player Page (hidden by default) -->
+    <div class="video-player-page" id="videoPlayerPage" style="display: none;">
+      <div class="player-container">
+        <div class="video-player" id="mainPlayer">
+          <video id="videoElement" src=""></video>
+          <div class="player-controls">
+            <div class="progress-bar" id="progressBar">
+              <div class="progress-filled" id="progressFilled"></div>
+              <div class="progress-handle" id="progressHandle"></div>
+            </div>
+            <div class="controls-row">
+              <div class="controls-left">
+                <button class="control-btn" id="playPauseBtn">
+                  <i class="ph-fill ph-play"></i>
+                </button>
+                <button class="control-btn" id="prevBtn">
+                  <i class="ph-fill ph-skip-back"></i>
+                </button>
+                <button class="control-btn" id="nextBtn">
+                  <i class="ph-fill ph-skip-forward"></i>
+                </button>
+                <div class="volume-control">
+                  <button class="control-btn" id="volumeBtn">
+                    <i class="ph-fill ph-speaker-high"></i>
+                  </button>
+                  <input type="range" class="volume-slider" id="volumeSlider" min="0" max="100" value="100">
+                </div>
+                <span class="time-display" id="timeDisplay">0:00 / 0:00</span>
+              </div>
+              <div class="controls-right">
+                <button class="control-btn" id="playbackSpeedBtn">
+                  <span>1x</span>
+                </button>
+                <button class="control-btn" id="fullscreenBtn">
+                  <i class="ph-fill ph-corners-out"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="video-info">
+          <h1 class="video-title" id="videoTitle"></h1>
+          <div class="video-meta-row">
+            <span class="video-views" id="videoViews"></span>
+            <div class="video-actions">
+              <button class="action-btn" id="likeBtn">
+                <i class="ph-fill ph-thumbs-up"></i>
+                <span id="likeCount">0</span>
+              </button>
+              <button class="action-btn" id="dislikeBtn">
+                <i class="ph-fill ph-thumbs-down"></i>
+              </button>
+              <button class="action-btn" id="shareBtn">
+                <i class="ph-fill ph-share-network"></i>
+                <span>Share</span>
+              </button>
+              <button class="action-btn" id="saveBtn">
+                <i class="ph-fill ph-bookmark-simple"></i>
+                <span>Save</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="channel-row">
+          <div class="channel-info">
+            <img class="channel-avatar" id="channelAvatar" src="" alt="">
+            <div class="channel-details">
+              <h3 class="channel-name" id="channelName"></h3>
+              <span class="subscriber-count" id="subscriberCount"></span>
+            </div>
+          </div>
+          <button class="subscribe-btn" id="subscribeBtn">
+            <i class="ph-fill ph-bell"></i>
+            <span>Subscribe</span>
+          </button>
+        </div>
+
+        <div class="video-description" id="videoDescription">
+          <p></p>
+        </div>
+
+        <div class="comments-section">
+          <h3 class="comments-title">
+            <span id="commentCount">0</span> Comments
+          </h3>
+          <div class="comment-sort">
+            <i class="ph ph-caret-down"></i>
+            <span>Sort by</span>
+          </div>
+          <div class="comment-input-wrapper">
+            <img src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=100&h=100&fit=crop" alt="" class="comment-avatar">
+            <div class="comment-input-container">
+              <input type="text" class="comment-input" placeholder="Add a comment...">
+              <div class="comment-actions">
+                <button class="comment-cancel">Cancel</button>
+                <button class="comment-submit">Comment</button>
+              </div>
+            </div>
+          </div>
+          <div class="comments-list" id="commentsList">
+            <!-- Comments will be injected here -->
+          </div>
+        </div>
+      </div>
+
+      <aside class="recommendations">
+        <h3 class="recommendations-title">Up next</h3>
+        <div class="recommendations-list" id="recommendationsList">
+          <!-- Recommendations will be injected here -->
+        </div>
+      </aside>
+    </div>
+
+    <!-- Upload Modal -->
+    <div class="modal-overlay" id="uploadModal" style="display: none;">
+      <div class="modal">
+        <div class="modal-header">
+          <h2>Upload Video</h2>
+          <button class="modal-close" id="closeUploadModal">
+            <i class="ph ph-x"></i>
+          </button>
+        </div>
+        <div class="modal-body">
+          <div class="upload-zone" id="uploadZone">
+            <i class="ph-fill ph-cloud-arrow-up"></i>
+            <h3>Drag and drop your video here</h3>
+            <p>or click to browse</p>
+            <input type="file" id="fileInput" accept="video/*" style="display: none;">
+          </div>
+          <div class="upload-preview" id="uploadPreview" style="display: none;">
+            <video id="previewVideo" controls></video>
+            <button class="remove-video" id="removeVideo">
+              <i class="ph ph-x"></i>
+            </button>
+          </div>
+          <div class="upload-form" id="uploadForm" style="display: none;">
+            <div class="form-group">
+              <label for="videoTitleInput">Title</label>
+              <input type="text" id="videoTitleInput" placeholder="Enter video title">
+            </div>
+            <div class="form-group">
+              <label for="videoDescriptionInput">Description</label>
+              <textarea id="videoDescriptionInput" placeholder="Tell viewers about your video"></textarea>
+            </div>
+            <div class="form-group">
+              <label for="videoCategoryInput">Category</label>
+              <select id="videoCategoryInput">
+                <option value="">Select category</option>
+                <option value="gaming">Gaming</option>
+                <option value="music">Music</option>
+                <option value="tech">Tech</option>
+                <option value="sports">Sports</option>
+                <option value="cooking">Cooking</option>
+                <option value="travel">Travel</option>
+                <option value="comedy">Comedy</option>
+                <option value="education">Education</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="videoTagsInput">Tags</label>
+              <input type="text" id="videoTagsInput" placeholder="Separate tags with commas">
+            </div>
+          </div>
+          <div class="upload-progress" id="uploadProgress" style="display: none;">
+            <div class="progress-bar-container">
+              <div class="progress-bar-fill" id="uploadProgressBar"></div>
+            </div>
+            <span class="progress-text" id="uploadProgressText">Uploading... 0%</span>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn-secondary" id="cancelUpload">Cancel</button>
+          <button class="btn-primary" id="submitUpload" disabled>Upload</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div class="toast" id="toast">
+      <span class="toast-message" id="toastMessage"></span>
+    </div>
+  </div>
+
+  <script src="js/data.js"></script>
+  <script src="js/utils.js"></script>
+  <script src="js/components.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
