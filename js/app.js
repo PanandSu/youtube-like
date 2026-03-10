@@ -2072,7 +2072,7 @@ function openPlaylistPage(playlistId) {
   channelPage.style.display = 'none';
 
   // Set playlist info
-  const playlistName = document.getElementById('playlistName');
+  const playlistName = document.getElementById('playlistPageName');
   const playlistMeta = document.getElementById('playlistMeta');
   const playlistVideos = document.getElementById('playlistVideos');
 
@@ -2764,7 +2764,7 @@ function resetUploadForm() {
   }
 
   // Reset chapters
-  const chaptersList = document.getElementById('chaptersList');
+  const chaptersList = document.getElementById('uploadChaptersList');
   if (chaptersList) {
     chaptersList.innerHTML = `
       <div class="chapter-input-row">
@@ -2779,7 +2779,7 @@ function resetUploadForm() {
 // Setup chapter input handlers
 function setupChapterInputHandlers() {
   const addChapterBtn = document.getElementById('addChapterBtn');
-  const chaptersList = document.getElementById('chaptersList');
+  const chaptersList = document.getElementById('uploadChaptersList');
 
   if (addChapterBtn && chaptersList) {
     addChapterBtn.addEventListener('click', () => {
