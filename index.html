@@ -151,6 +151,21 @@
         <button class="category-chip" data-category="education">Education</button>
       </div>
 
+      <!-- Duration Filter -->
+      <div class="filter-bar">
+        <button class="filter-btn" id="durationFilterBtn">
+          <i class="ph ph-clock"></i>
+          <span>Duration</span>
+          <i class="ph ph-caret-down"></i>
+        </button>
+        <div class="filter-dropdown" id="durationFilterDropdown" style="display: none;">
+          <button class="filter-option active" data-duration="all">Any duration</button>
+          <button class="filter-option" data-duration="short">Under 4 minutes</button>
+          <button class="filter-option" data-duration="medium">4 - 20 minutes</button>
+          <button class="filter-option" data-duration="long">Over 20 minutes</button>
+        </div>
+      </div>
+
       <!-- Continue Watching Section -->
       <section class="continue-watching-section" id="continueWatchingSection" style="display: none;">
         <h2>Continue Watching</h2>
@@ -253,6 +268,10 @@
               <button class="action-btn" id="transcriptBtn">
                 <i class="ph ph-text-aa"></i>
                 <span>Transcript</span>
+              </button>
+              <button class="action-btn" id="downloadBtn">
+                <i class="ph ph-download-simple"></i>
+                <span>Download</span>
               </button>
           </div>
         </div>

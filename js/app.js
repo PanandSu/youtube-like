@@ -151,6 +151,7 @@ let selectedFile = null;
 let currentSpeedIndex = 2; // 1x
 let appCurrentVideo = null;
 let appCurrentCategory = 'all';
+let appCurrentDuration = 'all';
 let appSearchQuery = '';
 let currentRoute = 'home';
 
@@ -528,6 +529,49 @@ function setupEventListeners() {
 
     appCurrentCategory = chip.dataset.category;
     loadVideos();
+  });
+
+  // Duration filter
+  const durationFilterBtn = document.getElementById('durationFilterBtn');
+  const durationFilterDropdown = document.getElementById('durationFilterDropdown');
+
+  if (durationFilterBtn) {
+    durationFilterBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      if (durationFilterDropdown.style.display === 'none') {
+        durationFilterDropdown.style.display = 'block';
+      } else {
+        durationFilterDropdown.style.display = 'none';
+      }
+    });
+  }
+
+  if (durationFilterDropdown) {
+    durationFilterDropdown.addEventListener('click', (e) => {
+      const option = e.target.closest('.filter-option');
+      if (!option) return;
+
+      durationFilterDropdown.querySelectorAll('.filter-option').forEach(o => o.classList.remove('active'));
+      option.classList.add('active');
+
+      appCurrentDuration = option.dataset.duration;
+      durationFilterDropdown.style.display = 'none';
+
+      // Update button text
+      const span = durationFilterBtn.querySelector('span');
+      if (span) {
+        span.textContent = option.textContent;
+      }
+
+      loadVideos();
+    });
+  }
+
+  // Close dropdown when clicking outside
+  document.addEventListener('click', (e) => {
+    if (durationFilterDropdown && !durationFilterBtn.contains(e.target) && !durationFilterDropdown.contains(e.target)) {
+      durationFilterDropdown.style.display = 'none';
+    }
   });
 
   // Upload modal
@@ -2428,7 +2472,22 @@ async function loadVideos() {
 
   // Reset pagination
   currentPage = 1;
-  allFilteredVideos = utils.filterVideos(videos, appCurrentCategory, appSearchQuery);
+  let filteredVideos = utils.filterVideos(videos, appCurrentCategory, appSearchQuery);
+
+  // Apply duration filter
+  if (appCurrentDuration !== 'all') {
+    filteredVideos = filteredVideos.filter(video => {
+      const durationSecs = parseVideoDuration(video.duration);
+      switch (appCurrentDuration) {
+        case 'short': return durationSecs < 240; // Under 4 minutes
+        case 'medium': return durationSecs >= 240 && durationSecs <= 1200; // 4-20 minutes
+        case 'long': return durationSecs > 1200; // Over 20 minutes
+        default: return true;
+      }
+    });
+  }
+
+  allFilteredVideos = filteredVideos;
   hasMoreVideos = allFilteredVideos.length > VIDEOS_PER_PAGE;
 
   const videosToRender = allFilteredVideos.slice(0, VIDEOS_PER_PAGE);
@@ -3115,6 +3174,38 @@ function setupPlayerControls() {
   if (transcriptCloseBtn) {
     transcriptCloseBtn.addEventListener('click', () => {
       transcriptSection.style.display = 'none';
+    });
+  }
+
+  // Download button
+  const downloadBtn = document.getElementById('downloadBtn');
+  if (downloadBtn) {
+    downloadBtn.addEventListener('click', async () => {
+      if (!appCurrentVideo) return;
+
+      const videoUrl = appCurrentVideo.videoUrl;
+      if (!videoUrl) {
+        utils.showToast('Download not available for this video');
+        return;
+      }
+
+      try {
+        utils.showToast('Preparing download...');
+
+        // Create an anchor element to trigger download
+        const a = document.createElement('a');
+        a.href = videoUrl;
+        a.download = `${appCurrentVideo.title}.mp4`;
+        a.target = '_blank';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+
+        utils.showToast('Download started!');
+      } catch (error) {
+        console.error('Download error:', error);
+        utils.showToast('Download failed. Please try again.');
+      }
     });
   }
 
