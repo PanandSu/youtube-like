@@ -164,6 +164,9 @@ function renderComment(comment) {
   const likedComments = user?.likedComments || [];
   const isLiked = likedComments.includes(comment.id);
 
+  // Parse comment text for timestamps and make them clickable
+  const commentText = parseCommentTimestamps(comment.text);
+
   return `
     <div class="comment" data-comment-id="${comment.id}">
       <img class="comment-avatar" src="${comment.avatar}" alt="${comment.author}">
@@ -172,7 +175,7 @@ function renderComment(comment) {
           <span class="comment-author">${comment.author}</span>
           <span class="comment-time">${utils.timeAgo(comment.uploadedAt)}</span>
         </div>
-        <p class="comment-text">${comment.text}</p>
+        <p class="comment-text">${commentText}</p>
         <div class="comment-actions">
           <button class="comment-like ${isLiked ? 'liked' : ''}" data-comment-id="${comment.id}">
             <i class="ph-fill ph-thumbs-up"></i>
@@ -184,6 +187,15 @@ function renderComment(comment) {
       </div>
     </div>
   `;
+}
+
+// Parse comment text for timestamps and make them clickable
+function parseCommentTimestamps(text) {
+  // Match patterns like 1:23, 1:23:45, 0:45, etc.
+  const timestampRegex = /(\d{1,2}:)?(\d{1,2}):(\d{2})/g;
+  return text.replace(timestampRegex, (match) => {
+    return `<span class="comment-timestamp" data-timestamp="${match}">${match}</span>`;
+  });
 }
 
 // Render reply
@@ -314,7 +326,31 @@ function updateVideoPlayerInfo(video) {
   subscribeBtn.querySelector('span').textContent = video.subscribed ? 'Subscribed' : 'Subscribe';
 
   const descEl = document.getElementById('videoDescription');
-  descEl.querySelector('p').textContent = video.description;
+  const descText = video.description || '';
+  const maxLength = 150;
+  const showMoreBtn = document.getElementById('showMoreBtn');
+
+  if (descText.length > maxLength) {
+    descEl.querySelector('p').textContent = descText.substring(0, maxLength) + '...';
+    if (showMoreBtn) {
+      showMoreBtn.style.display = 'block';
+      showMoreBtn.textContent = 'Show more';
+      showMoreBtn.onclick = () => {
+        if (showMoreBtn.textContent === 'Show more') {
+          descEl.querySelector('p').textContent = descText;
+          showMoreBtn.textContent = 'Show less';
+        } else {
+          descEl.querySelector('p').textContent = descText.substring(0, maxLength) + '...';
+          showMoreBtn.textContent = 'Show more';
+        }
+      };
+    }
+  } else {
+    descEl.querySelector('p').textContent = descText;
+    if (showMoreBtn) {
+      showMoreBtn.style.display = 'none';
+    }
+  }
 
   // Render video chapters
   renderVideoChapters(video);

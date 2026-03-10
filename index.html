@@ -231,6 +231,9 @@
                 <button class="control-btn" id="loopBtn" title="Loop">
                   <i class="ph-fill ph-repeat"></i>
                 </button>
+                <button class="control-btn" id="captionsBtn" title="Captions">
+                  <i class="ph ph-closed-captioning"></i>
+                </button>
                 <button class="control-btn" id="miniPlayerBtn" title="Mini player">
                   <i class="ph ph-corners-in"></i>
                 </button>
@@ -250,11 +253,25 @@
           <div class="video-meta-row">
             <span class="video-views" id="videoViews"></span>
             <div class="video-actions">
-              <button class="action-btn" id="likeBtn">
-                <i class="ph-fill ph-thumbs-up"></i>
-                <span id="likeCount">0</span>
-              </button>
+              <div class="reaction-container">
+                <button class="action-btn" id="likeBtn">
+                  <i class="ph-fill ph-thumbs-up"></i>
+                  <span id="likeCount">0</span>
+                </button>
+                <button class="action-btn" id="reactionBtn" title="Like with reaction">
+                  <i class="ph-fill ph-heart"></i>
+                </button>
+                <div class="reaction-picker" id="reactionPicker" style="display: none;">
+                  <button class="reaction-emoji" data-reaction="like" title="Like">👍</button>
+                  <button class="reaction-emoji" data-reaction="love" title="Love">❤️</button>
+                  <button class="reaction-emoji" data-reaction="laugh" title="Laugh">😂</button>
+                  <button class="reaction-emoji" data-reaction="wow" title="Wow">😮</button>
+                  <button class="reaction-emoji" data-reaction="sad" title="Sad">😢</button>
+                  <button class="reaction-emoji" data-reaction="angry" title="Angry">😡</button>
+                </div>
+              </div>
               <button class="action-btn" id="dislikeBtn">
+                <i class="ph-fill"></i>
                 <i class="ph-fill ph-thumbs-down"></i>
               </button>
               <button class="action-btn" id="shareBtn">
@@ -292,6 +309,7 @@
 
         <div class="video-description" id="videoDescription">
           <p></p>
+          <button class="show-more-btn" id="showMoreBtn" style="display: none;">Show more</button>
         </div>
 
         <div class="video-chapters" id="videoChapters" style="display: none;">

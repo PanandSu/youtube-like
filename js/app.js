@@ -1216,6 +1216,27 @@ function setupCommentEventListeners() {
       utils.showToast(!isLiked ? 'Comment liked' : 'Like removed');
     });
   });
+
+  // Comment timestamp click handlers
+  document.querySelectorAll('.comment-timestamp').forEach(timestamp => {
+    timestamp.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const timestampStr = timestamp.dataset.timestamp;
+      const seconds = parseTimestamp(timestampStr);
+
+      if (window.seekToTime) {
+        window.seekToTime(seconds);
+      } else {
+        const videoElement = document.getElementById('videoElement') || document.getElementById('mainVideo');
+        if (videoElement) {
+          videoElement.currentTime = seconds;
+          videoElement.play();
+        }
+      }
+
+      utils.showToast(`Jumped to ${timestampStr}`);
+    });
+  });
 }
 
 // Setup auth event listeners
@@ -2969,6 +2990,74 @@ function setupPlayerControls() {
     utils.showToast(loopEnabled ? 'Loop enabled' : 'Loop disabled');
   });
 
+  // Captions/Subtitles
+  const captionsBtn = document.getElementById('captionsBtn');
+  let captionsEnabled = false;
+
+  if (captionsBtn) {
+    captionsBtn.addEventListener('click', () => {
+      captionsEnabled = !captionsEnabled;
+      captionsBtn.classList.toggle('active', captionsEnabled);
+
+      if (captionsEnabled) {
+        // Show captions overlay
+        showCaptionsOverlay();
+        utils.showToast('Captions enabled');
+      } else {
+        hideCaptionsOverlay();
+        utils.showToast('Captions disabled');
+      }
+    });
+  }
+
+  // Show captions overlay on video
+  function showCaptionsOverlay() {
+    let overlay = document.getElementById('captionsOverlay');
+    if (!overlay) {
+      overlay = document.createElement('div');
+      overlay.id = 'captionsOverlay';
+      overlay.className = 'captions-overlay';
+      document.getElementById('videoPlayer').appendChild(overlay);
+    }
+
+    // Generate captions from transcript
+    if (appCurrentVideo) {
+      const transcript = generateTranscript(appCurrentVideo);
+      if (transcript.length > 0) {
+        overlay.style.display = 'block';
+      }
+    }
+  }
+
+  function hideCaptionsOverlay() {
+    const overlay = document.getElementById('captionsOverlay');
+    if (overlay) {
+      overlay.style.display = 'none';
+    }
+  }
+
+  // Update captions based on video time
+  videoElement.addEventListener('timeupdate', () => {
+    if (!captionsEnabled || !appCurrentVideo) return;
+
+    const overlay = document.getElementById('captionsOverlay');
+    if (!overlay) return;
+
+    const transcript = generateTranscript(appCurrentVideo);
+    const currentTime = Math.floor(videoElement.currentTime);
+
+    const currentLine = transcript.find((line, index) => {
+      const nextLine = transcript[index + 1];
+      return currentTime >= line.time && (!nextLine || currentTime < nextLine.time);
+    });
+
+    if (currentLine) {
+      overlay.textContent = currentLine.text;
+    } else {
+      overlay.textContent = '';
+    }
+  });
+
   // Mini player
   const miniPlayerBtn = document.getElementById('miniPlayerBtn');
   const miniPlayer = document.getElementById('miniPlayer');
@@ -3101,6 +3190,38 @@ function setupPlayerControls() {
       components.updateVideoPlayerInfo(appCurrentVideo);
     }
   });
+
+  // Reaction picker
+  const reactionBtn = document.getElementById('reactionBtn');
+  const reactionPicker = document.getElementById('reactionPicker');
+
+  if (reactionBtn && reactionPicker) {
+    reactionBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      reactionPicker.style.display = reactionPicker.style.display === 'none' ? 'flex' : 'none';
+    });
+
+    reactionPicker.querySelectorAll('.reaction-emoji').forEach(emoji => {
+      emoji.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const reaction = emoji.dataset.reaction;
+        const reactionEmojis = {
+          like: '👍',
+          love: '❤️',
+          laugh: '😂',
+          wow: '😮',
+          sad: '😢',
+          angry: '😡'
+        };
+        utils.showToast(`Reacted with ${reactionEmojis[reaction]}`);
+        reactionPicker.style.display = 'none';
+      });
+    });
+
+    document.addEventListener('click', () => {
+      reactionPicker.style.display = 'none';
+    });
+  }
 
   dislikeBtn.addEventListener('click', () => {
     utils.showToast('Dislike recorded');

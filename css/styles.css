@@ -972,6 +972,23 @@ body.theater-mode .recommendations {
   opacity: 1;
 }
 
+/* Captions Overlay */
+.captions-overlay {
+  position: absolute;
+  bottom: 80px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0, 0, 0, 0.8);
+  color: white;
+  padding: 8px 16px;
+  border-radius: 4px;
+  font-size: 18px;
+  max-width: 80%;
+  text-align: center;
+  display: none;
+  z-index: 10;
+}
+
 .progress-bar {
   height: 4px;
   background: rgba(255, 255, 255, 0.3);
@@ -1118,6 +1135,42 @@ body.theater-mode .recommendations {
   gap: 8px;
 }
 
+.reaction-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.reaction-picker {
+  position: absolute;
+  bottom: 100%;
+  left: 0;
+  margin-bottom: 8px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-full);
+  padding: 8px;
+  display: flex;
+  gap: 4px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+  z-index: 100;
+}
+
+.reaction-emoji {
+  background: none;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 50%;
+  transition: transform 0.15s ease;
+}
+
+.reaction-emoji:hover {
+  transform: scale(1.2);
+  background: var(--surface);
+}
+
 .action-btn {
   display: flex;
   align-items: center;
@@ -1211,6 +1264,20 @@ body.theater-mode .recommendations {
 .video-description p {
   color: var(--text-secondary);
   line-height: 1.6;
+}
+
+.show-more-btn {
+  margin-top: 8px;
+  background: none;
+  border: none;
+  color: var(--text-primary);
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0;
+}
+
+.show-more-btn:hover {
+  color: var(--accent-primary);
 }
 
 /* Video Chapters */
@@ -2679,6 +2746,16 @@ body.theater-mode .recommendations {
   color: var(--text-secondary);
   line-height: 1.5;
   margin-bottom: 8px;
+}
+
+.comment-timestamp {
+  color: var(--accent-primary);
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.comment-timestamp:hover {
+  text-decoration: underline;
 }
 
 .comment-actions {
