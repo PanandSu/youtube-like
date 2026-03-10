@@ -16,10 +16,15 @@ function renderVideoCard(video) {
     }
   }
 
+  // Sanitize user-generated content
+  const safeTitle = utils.sanitizeHTML(video.title || '');
+  const safeChannelName = utils.sanitizeHTML(video.channel?.name || '');
+  const safeChannelId = utils.sanitizeHTML(video.channel?.id || '');
+
   return `
     <article class="video-card" data-video-id="${video.id}">
       <div class="video-thumbnail">
-        <img src="${video.thumbnail}" alt="${video.title}" loading="lazy" data-video-src="${video.videoUrl || ''}">
+        <img src="${video.thumbnail}" alt="${safeTitle}" loading="lazy" data-video-src="${video.videoUrl || ''}">
         <span class="video-duration">${video.duration}</span>
         ${watchProgress > 0 && watchProgress < 95 ? `<div class="watch-progress-bar"><div class="watch-progress" style="width: ${watchProgress}%"></div></div>` : ''}
         <button class="video-menu" aria-label="Video options">
@@ -29,19 +34,19 @@ function renderVideoCard(video) {
           <div class="preview-video-container">
             <video muted preload="metadata"></video>
             <div class="preview-info">
-              <span class="preview-title">${video.title.substring(0, 50)}${video.title.length > 50 ? '...' : ''}</span>
-              <span class="preview-channel">${video.channel.name}</span>
+              <span class="preview-title">${safeTitle.substring(0, 50)}${safeTitle.length > 50 ? '...' : ''}</span>
+              <span class="preview-channel">${safeChannelName}</span>
             </div>
           </div>
         </div>
       </div>
       <div class="video-details">
         <div class="video-avatar">
-          <img src="${video.channel.avatar}" alt="${video.channel.name}">
+          <img src="${video.channel.avatar}" alt="${safeChannelName}">
         </div>
         <div class="video-info">
-          <h3 class="video-title">${video.title}</h3>
-          <a href="#" class="video-channel" data-channel-id="${video.channel.id}">${video.channel.name}</a>
+          <h3 class="video-title">${safeTitle}</h3>
+          <a href="#" class="video-channel" data-channel-id="${safeChannelId}">${safeChannelName}</a>
           <div class="video-meta">
             <span>${utils.formatNumber(video.views)} views</span>
             <span>•</span>
@@ -164,15 +169,19 @@ function renderComment(comment) {
   const likedComments = user?.likedComments || [];
   const isLiked = likedComments.includes(comment.id);
 
+  // Sanitize user-generated content
+  const safeAuthor = utils.sanitizeHTML(comment.author || '');
+  const safeText = utils.sanitizeHTML(comment.text || '');
+
   // Parse comment text for timestamps and make them clickable
-  const commentText = parseCommentTimestamps(comment.text);
+  const commentText = parseCommentTimestamps(safeText);
 
   return `
     <div class="comment" data-comment-id="${comment.id}">
-      <img class="comment-avatar" src="${comment.avatar}" alt="${comment.author}">
+      <img class="comment-avatar" src="${comment.avatar}" alt="${safeAuthor}">
       <div class="comment-content">
         <div class="comment-header">
-          <span class="comment-author">${comment.author}</span>
+          <span class="comment-author">${safeAuthor}</span>
           <span class="comment-time">${utils.timeAgo(comment.uploadedAt)}</span>
         </div>
         <p class="comment-text">${commentText}</p>
@@ -191,11 +200,26 @@ function renderComment(comment) {
 
 // Parse comment text for timestamps and make them clickable
 function parseCommentTimestamps(text) {
-  // Match patterns like 1:23, 1:23:45, 0:45, etc.
-  const timestampRegex = /(\d{1,2}:)?(\d{1,2}):(\d{2})/g;
-  return text.replace(timestampRegex, (match) => {
-    return `<span class="comment-timestamp" data-timestamp="${match}">${match}</span>`;
+  if (!text) return '';
+
+  // First, temporarily protect timestamp patterns
+  const timestamps = [];
+  let protectedText = text.replace(/(\d{1,2}:)?(\d{1,2}):(\d{2})/g, (match) => {
+    const placeholder = `__TIMESTAMP_${timestamps.length}__`;
+    timestamps.push(match);
+    return placeholder;
   });
+
+  // Then sanitize the rest of the text
+  const sanitized = utils.sanitizeHTML(protectedText);
+
+  // Restore timestamps
+  let result = sanitized;
+  timestamps.forEach((ts, i) => {
+    result = result.replace(`__TIMESTAMP_${i}__`, `<span class="comment-timestamp" data-timestamp="${ts}">${ts}</span>`);
+  });
+
+  return result;
 }
 
 // Render reply
@@ -205,15 +229,19 @@ function renderReply(reply) {
   const likedComments = user?.likedComments || [];
   const isLiked = likedComments.includes(reply.id);
 
+  // Sanitize user-generated content
+  const safeAuthor = utils.sanitizeHTML(reply.author || '');
+  const safeText = utils.sanitizeHTML(reply.text || '');
+
   return `
     <div class="comment" data-comment-id="${reply.id}">
-      <img class="comment-avatar" src="${reply.avatar}" alt="${reply.author}" style="width: 32px; height: 32px;">
+      <img class="comment-avatar" src="${reply.avatar}" alt="${safeAuthor}" style="width: 32px; height: 32px;">
       <div class="comment-content">
         <div class="comment-header">
-          <span class="comment-author">${reply.author}</span>
+          <span class="comment-author">${safeAuthor}</span>
           <span class="comment-time">${utils.timeAgo(reply.uploadedAt)}</span>
         </div>
-        <p class="comment-text">${reply.text}</p>
+        <p class="comment-text">${safeText}</p>
         <div class="comment-actions">
           <button class="comment-like ${isLiked ? 'liked' : ''}" data-comment-id="${reply.id}">
             <i class="ph-fill ph-thumbs-up"></i>

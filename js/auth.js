@@ -107,6 +107,8 @@ function register(email, username, password) {
     watchHistory: [],
     likedVideos: [],
     savedVideos: [],
+    likedComments: [],
+    playlists: [],
     notifications: [],
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),

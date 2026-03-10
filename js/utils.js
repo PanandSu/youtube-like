@@ -131,6 +131,14 @@ function saveToStorage(key, value) {
   }
 }
 
+// Sanitize HTML to prevent XSS attacks
+function sanitizeHTML(str) {
+  if (!str) return '';
+  const div = document.createElement('div');
+  div.textContent = str;
+  return div.innerHTML;
+}
+
 // Export utilities
 window.utils = {
   formatNumber,
@@ -145,5 +153,6 @@ window.utils = {
   getRecommendations,
   playbackSpeeds,
   getFromStorage,
-  saveToStorage
+  saveToStorage,
+  sanitizeHTML
 };
