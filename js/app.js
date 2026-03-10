@@ -3046,7 +3046,23 @@ function setupPlayerControls() {
   videoElement.addEventListener('ended', () => {
     isPlaying = false;
     playPauseBtn.innerHTML = '<i class="ph-fill ph-play"></i>';
-    // Auto-play next video if autoplay is enabled
+
+    // Check for repeat one mode
+    if (repeatMode === 'one') {
+      videoElement.currentTime = 0;
+      videoElement.play();
+      isPlaying = true;
+      playPauseBtn.innerHTML = '<i class="ph-fill ph-pause"></i>';
+      return;
+    }
+
+    // Use queue if available
+    if (typeof window.playNextInQueue === 'function' && queue.length > 0) {
+      const played = window.playNextInQueue();
+      if (played) return;
+    }
+
+    // Fallback to recommendations
     if (appCurrentVideo && autoplayEnabled) {
       const recommendations = utils.getRecommendations(appCurrentVideo.id, 1);
       if (recommendations.length > 0) {
@@ -3063,16 +3079,44 @@ function setupPlayerControls() {
     localStorage.setItem('videoshare_playback_speed', currentPlaybackSpeed);
   });
 
-  // Quality selection
+  // Quality selection with dropdown menu
   const qualityBtn = document.getElementById('qualityBtn');
-  const qualities = ['Auto', '1080p', '720p', '480p', '360p'];
-  let currentQualityIndex = 0;
+  const qualityMenu = document.getElementById('qualityMenu');
+  const qualityOptions = document.querySelectorAll('.quality-option');
 
-  qualityBtn.addEventListener('click', () => {
-    currentQualityIndex = (currentQualityIndex + 1) % qualities.length;
-    const quality = qualities[currentQualityIndex];
-    qualityBtn.querySelector('span').textContent = quality;
-    utils.showToast(`Quality set to ${quality}`);
+  qualityBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    qualityMenu.style.display = qualityMenu.style.display === 'none' ? 'block' : 'none';
+  });
+
+  // Close menu when clicking outside
+  document.addEventListener('click', () => {
+    if (qualityMenu) {
+      qualityMenu.style.display = 'none';
+    }
+  });
+
+  // Handle quality selection
+  qualityOptions.forEach(option => {
+    option.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const quality = option.dataset.quality;
+
+      // Update button text
+      qualityBtn.querySelector('span').textContent = quality === 'auto' ? 'Auto' : quality;
+
+      // Update active state
+      qualityOptions.forEach(o => o.classList.remove('active'));
+      option.classList.add('active');
+
+      // Save preference
+      localStorage.setItem('videoshare_quality', quality);
+
+      // Close menu
+      qualityMenu.style.display = 'none';
+
+      utils.showToast(`Quality set to ${quality === 'auto' ? 'Auto' : quality}`);
+    });
   });
 
   // Picture-in-Picture
@@ -3122,6 +3166,143 @@ function setupPlayerControls() {
     loopBtn.classList.toggle('active', loopEnabled);
     utils.showToast(loopEnabled ? 'Loop enabled' : 'Loop disabled');
   });
+
+  // Queue/Playlist functionality
+  const queueBtn = document.getElementById('queueBtn');
+  const queuePanel = document.getElementById('queuePanel');
+  const closeQueueBtn = document.getElementById('closeQueueBtn');
+  const queueList = document.getElementById('queueList');
+  const shuffleBtn = document.getElementById('shuffleBtn');
+  let queue = [];
+  let queueIndex = 0;
+  let shuffleEnabled = false;
+  let repeatMode = 'off'; // off, one, all
+
+  // Queue button - toggle queue panel
+  if (queueBtn) {
+    queueBtn.addEventListener('click', () => {
+      queuePanel.style.display = queuePanel.style.display === 'none' ? 'flex' : 'none';
+    });
+  }
+
+  // Close queue panel
+  if (closeQueueBtn) {
+    closeQueueBtn.addEventListener('click', () => {
+      queuePanel.style.display = 'none';
+    });
+  }
+
+  // Shuffle button
+  if (shuffleBtn) {
+    shuffleBtn.addEventListener('click', () => {
+      shuffleEnabled = !shuffleEnabled;
+      shuffleBtn.classList.toggle('active', shuffleEnabled);
+      utils.showToast(shuffleEnabled ? 'Shuffle enabled' : 'Shuffle disabled');
+      if (shuffleEnabled && queue.length > 0) {
+        // Shuffle the queue
+        for (let i = queue.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [queue[i], queue[j]] = [queue[j], queue[i]];
+        }
+        renderQueue();
+      }
+    });
+  }
+
+  // Add current video to queue and fill with recommendations
+  function updateQueue(currentVideoId) {
+    const recommendations = utils.getRecommendations(currentVideoId, 20);
+    queue = [currentVideoId, ...recommendations.map(v => v.id)];
+    queueIndex = 0;
+    renderQueue();
+  }
+
+  // Render queue
+  function renderQueue() {
+    if (!queueList) return;
+
+    queueList.innerHTML = queue.map((videoId, index) => {
+      const video = videos.find(v => v.id === videoId);
+      if (!video) return '';
+
+      return `
+        <div class="queue-item ${index === queueIndex ? 'active' : ''}" data-index="${index}">
+          <span class="queue-item-number">${index + 1}</span>
+          <div class="queue-item-thumb">
+            <img src="${video.thumbnail}" alt="${video.title}">
+          </div>
+          <div class="queue-item-info">
+            <div class="queue-item-title">${video.title}</div>
+            <div class="queue-item-channel">${video.channel.name}</div>
+          </div>
+          <button class="queue-item-remove" data-index="${index}">
+            <i class="ph ph-x"></i>
+          </button>
+        </div>
+      `;
+    }).join('');
+
+    // Add click handlers
+    queueList.querySelectorAll('.queue-item').forEach(item => {
+      item.addEventListener('click', (e) => {
+        if (e.target.closest('.queue-item-remove')) return;
+        const index = parseInt(item.dataset.index);
+        playFromQueue(index);
+      });
+    });
+
+    // Add remove handlers
+    queueList.querySelectorAll('.queue-item-remove').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const index = parseInt(btn.dataset.index);
+        queue.splice(index, 1);
+        if (queueIndex >= queue.length) {
+          queueIndex = Math.max(0, queue.length - 1);
+        }
+        renderQueue();
+      });
+    });
+  }
+
+  // Play from queue
+  function playFromQueue(index) {
+    if (index < 0 || index >= queue.length) return;
+    queueIndex = index;
+    const videoId = queue[index];
+    openVideoPlayer(videoId);
+    renderQueue();
+  }
+
+  // Play next in queue
+  function playNextInQueue() {
+    if (queue.length === 0) return;
+
+    if (shuffleEnabled) {
+      // Random video from queue
+      queueIndex = Math.floor(Math.random() * queue.length);
+    } else {
+      queueIndex++;
+      if (queueIndex >= queue.length) {
+        if (repeatMode === 'all') {
+          queueIndex = 0;
+        } else {
+          return false; // No more videos
+        }
+      }
+    }
+
+    const videoId = queue[queueIndex];
+    openVideoPlayer(videoId);
+    renderQueue();
+    return true;
+  }
+
+  // Expose queue functions globally
+  window.updateQueue = updateQueue;
+  window.playNextInQueue = playNextInQueue;
+  window.getRepeatMode = () => repeatMode;
+  window.setRepeatMode = (mode) => { repeatMode = mode; };
 
   // Ad controls
   const adSkipBtn = document.getElementById('adSkipBtn');
@@ -3698,6 +3879,11 @@ function openVideoPlayer(videoId) {
   components.updateVideoPlayerInfo(appCurrentVideo);
   components.renderRecommendations(videoId);
   components.renderComments(window.mockData.comments);
+
+  // Update queue with current video and recommendations
+  if (typeof window.updateQueue === 'function') {
+    window.updateQueue(videoId);
+  }
 
   // Show ad (30% chance, not for shorts)
   const durationSecs = parseVideoDuration(appCurrentVideo.duration);

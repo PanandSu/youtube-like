@@ -223,9 +223,18 @@
                 <button class="control-btn" id="playbackSpeedBtn">
                   <span>1x</span>
                 </button>
-                <button class="control-btn" id="qualityBtn">
-                  <span>HD</span>
-                </button>
+                <div class="quality-selector" id="qualitySelector">
+                  <button class="control-btn" id="qualityBtn">
+                    <span>HD</span>
+                  </button>
+                  <div class="quality-menu" id="qualityMenu" style="display: none;">
+                    <button class="quality-option active" data-quality="1080p">1080p HD</button>
+                    <button class="quality-option" data-quality="720p">720p</button>
+                    <button class="quality-option" data-quality="480p">480p</button>
+                    <button class="quality-option" data-quality="360p">360p</button>
+                    <button class="quality-option" data-quality="auto">Auto</button>
+                  </div>
+                </div>
                 <button class="control-btn" id="pipBtn">
                   <i class="ph ph-picture-in-picture"></i>
                 </button>
@@ -234,6 +243,12 @@
                 </button>
                 <button class="control-btn" id="loopBtn" title="Loop">
                   <i class="ph-fill ph-repeat"></i>
+                </button>
+                <button class="control-btn" id="shuffleBtn" title="Shuffle">
+                  <i class="ph ph-shuffle"></i>
+                </button>
+                <button class="control-btn" id="queueBtn" title="Queue">
+                  <i class="ph ph-list-dashes"></i>
                 </button>
                 <button class="control-btn" id="captionsBtn" title="Captions">
                   <i class="ph ph-closed-captioning"></i>
@@ -387,6 +402,19 @@
           <!-- Recommendations will be injected here -->
         </div>
       </aside>
+
+      <!-- Queue Panel -->
+      <div class="queue-panel" id="queuePanel" style="display: none;">
+        <div class="queue-header">
+          <h3>Queue</h3>
+          <button class="queue-close" id="closeQueueBtn">
+            <i class="ph ph-x"></i>
+          </button>
+        </div>
+        <div class="queue-list" id="queueList">
+          <!-- Queue items will be injected here -->
+        </div>
+      </div>
     </div>
 
     <!-- Upload Modal -->
