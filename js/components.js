@@ -1,15 +1,39 @@
 // UI Components
 
+// Video preview container (global)
+let videoPreviewContainer = null;
+
 // Render video card
 function renderVideoCard(video) {
+  // Get watch progress if available
+  const user = window.auth?.getCurrentUser();
+  let watchProgress = 0;
+  if (user?.watchHistory) {
+    const historyItem = user.watchHistory.find(h => h.videoId === video.id);
+    if (historyItem && historyItem.lastPosition) {
+      const videoDuration = parseVideoDuration(video.duration);
+      watchProgress = (historyItem.lastPosition / videoDuration) * 100;
+    }
+  }
+
   return `
     <article class="video-card" data-video-id="${video.id}">
       <div class="video-thumbnail">
-        <img src="${video.thumbnail}" alt="${video.title}" loading="lazy">
+        <img src="${video.thumbnail}" alt="${video.title}" loading="lazy" data-video-src="${video.videoUrl || ''}">
         <span class="video-duration">${video.duration}</span>
+        ${watchProgress > 0 && watchProgress < 95 ? `<div class="watch-progress-bar"><div class="watch-progress" style="width: ${watchProgress}%"></div></div>` : ''}
         <button class="video-menu" aria-label="Video options">
           <i class="ph-fill ph-dots-three-vertical"></i>
         </button>
+        <div class="video-preview-tooltip" style="display: none;">
+          <div class="preview-video-container">
+            <video muted preload="metadata"></video>
+            <div class="preview-info">
+              <span class="preview-title">${video.title.substring(0, 50)}${video.title.length > 50 ? '...' : ''}</span>
+              <span class="preview-channel">${video.channel.name}</span>
+            </div>
+          </div>
+        </div>
       </div>
       <div class="video-details">
         <div class="video-avatar">
@@ -28,6 +52,85 @@ function renderVideoCard(video) {
     </article>
   `;
 }
+
+// Parse video duration string to seconds
+function parseVideoDuration(duration) {
+  if (!duration) return 0;
+  const parts = duration.split(':');
+  if (parts.length === 2) {
+    return parseInt(parts[0]) * 60 + parseInt(parts[1]);
+  } else if (parts.length === 3) {
+    return parseInt(parts[0]) * 3600 + parseInt(parts[1]) * 60 + parseInt(parts[2]);
+  }
+  return 0;
+}
+
+// Setup video preview on hover
+function setupVideoPreview() {
+  const previewContainer = document.createElement('div');
+  previewContainer.className = 'video-preview-container';
+  previewContainer.style.display = 'none';
+  document.body.appendChild(previewContainer);
+  videoPreviewContainer = previewContainer;
+
+  document.addEventListener('mouseover', (e) => {
+    const card = e.target.closest('.video-card');
+    if (!card) return;
+
+    const thumbnail = card.querySelector('.video-thumbnail');
+    const tooltip = thumbnail.querySelector('.video-preview-tooltip');
+    if (!tooltip) return;
+
+    const videoSrc = thumbnail.querySelector('img').dataset.videoSrc;
+    if (!videoSrc) return;
+
+    // Show tooltip
+    tooltip.style.display = 'block';
+
+    // Setup preview video
+    const previewVideo = tooltip.querySelector('video');
+    if (previewVideo && previewVideo.src !== videoSrc) {
+      previewVideo.src = videoSrc;
+
+      previewVideo.addEventListener('loadedmetadata', () => {
+        // Update duration display
+      }, { once: true });
+    }
+
+    // Position tooltip
+    const rect = thumbnail.getBoundingClientRect();
+    tooltip.style.position = 'fixed';
+    tooltip.style.top = rect.top + 'px';
+    tooltip.style.left = rect.left + 'px';
+    tooltip.style.width = rect.width + 'px';
+    tooltip.style.zIndex = '1000';
+
+    // Try to play preview
+    previewVideo.play().catch(() => {});
+  });
+
+  document.addEventListener('mouseout', (e) => {
+    const card = e.target.closest('.video-card');
+    if (!card) return;
+
+    const thumbnail = card.querySelector('.video-thumbnail');
+    const tooltip = thumbnail?.querySelector('.video-preview-tooltip');
+    const previewVideo = tooltip?.querySelector('video');
+
+    if (tooltip) {
+      tooltip.style.display = 'none';
+    }
+    if (previewVideo) {
+      previewVideo.pause();
+      previewVideo.currentTime = 0;
+    }
+  });
+}
+
+// Initialize video previews
+document.addEventListener('DOMContentLoaded', () => {
+  setTimeout(setupVideoPreview, 1000);
+});
 
 // Render recommendation card
 function renderRecommendationCard(video) {
@@ -49,6 +152,18 @@ function renderRecommendationCard(video) {
 
 // Render comment
 function renderComment(comment) {
+  const replies = comment.replies || [];
+  let repliesHtml = '';
+
+  if (replies.length > 0) {
+    repliesHtml = `<div class="comment-replies">${replies.map(reply => renderReply(reply)).join('')}</div>`;
+  }
+
+  // Check if user has liked this comment
+  const user = window.auth?.getCurrentUser();
+  const likedComments = user?.likedComments || [];
+  const isLiked = likedComments.includes(comment.id);
+
   return `
     <div class="comment" data-comment-id="${comment.id}">
       <img class="comment-avatar" src="${comment.avatar}" alt="${comment.author}">
@@ -59,11 +174,39 @@ function renderComment(comment) {
         </div>
         <p class="comment-text">${comment.text}</p>
         <div class="comment-actions">
-          <button class="comment-like">
+          <button class="comment-like ${isLiked ? 'liked' : ''}" data-comment-id="${comment.id}">
             <i class="ph-fill ph-thumbs-up"></i>
-            <span>${comment.likes}</span>
+            <span class="like-count">${comment.likes || 0}</span>
           </button>
           <button class="comment-reply">Reply</button>
+        </div>
+        ${repliesHtml}
+      </div>
+    </div>
+  `;
+}
+
+// Render reply
+function renderReply(reply) {
+  // Check if user has liked this reply
+  const user = window.auth?.getCurrentUser();
+  const likedComments = user?.likedComments || [];
+  const isLiked = likedComments.includes(reply.id);
+
+  return `
+    <div class="comment" data-comment-id="${reply.id}">
+      <img class="comment-avatar" src="${reply.avatar}" alt="${reply.author}" style="width: 32px; height: 32px;">
+      <div class="comment-content">
+        <div class="comment-header">
+          <span class="comment-author">${reply.author}</span>
+          <span class="comment-time">${utils.timeAgo(reply.uploadedAt)}</span>
+        </div>
+        <p class="comment-text">${reply.text}</p>
+        <div class="comment-actions">
+          <button class="comment-like ${isLiked ? 'liked' : ''}" data-comment-id="${reply.id}">
+            <i class="ph-fill ph-thumbs-up"></i>
+            <span class="like-count">${reply.likes || 0}</span>
+          </button>
         </div>
       </div>
     </div>
@@ -84,6 +227,9 @@ function renderVideoGrid(videosToRender) {
   emptyState.style.display = 'none';
   grid.innerHTML = videosToRender.map(renderVideoCard).join('');
 
+  // Setup video previews
+  setupVideoPreview();
+
   // Add click handlers
   grid.querySelectorAll('.video-card').forEach(card => {
     card.addEventListener('click', (e) => {
@@ -91,6 +237,26 @@ function renderVideoGrid(videosToRender) {
         const videoId = card.dataset.videoId;
         openVideoPlayer(videoId);
       }
+    });
+
+    // Add video menu click handler
+    const menuBtn = card.querySelector('.video-menu');
+    if (menuBtn) {
+      menuBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const videoId = card.dataset.videoId;
+        showVideoOptionsMenu(videoId, e);
+      });
+    }
+  });
+
+  // Add channel click handlers
+  grid.querySelectorAll('.video-channel').forEach(channelLink => {
+    channelLink.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      const channelId = channelLink.dataset.channelId;
+      openChannelPage(channelId);
     });
   });
 }
@@ -108,6 +274,17 @@ function renderRecommendations(videoId) {
       openVideoPlayer(videoId);
     });
   });
+}
+
+// Render subscriptions grid
+function renderSubscriptionsGrid(subscriptions) {
+  return subscriptions.map(channel => `
+    <div class="subscription-card" data-channel-id="${channel.id}">
+      <img src="${channel.avatar}" alt="${channel.name}">
+      <h3>${channel.name}</h3>
+      <p>Subscribed</p>
+    </div>
+  `).join('');
 }
 
 // Render comments
@@ -145,6 +322,7 @@ window.components = {
   renderVideoCard,
   renderRecommendationCard,
   renderComment,
+  renderReply,
   renderVideoGrid,
   renderRecommendations,
   renderComments,

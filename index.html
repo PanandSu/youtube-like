@@ -28,10 +28,27 @@
 
       <div class="search-container">
         <div class="search-wrapper">
-          <input type="text" class="search-input" id="searchInput" placeholder="Search videos...">
+          <input type="text" class="search-input" id="searchInput" placeholder="Search videos..." autocomplete="off">
           <button class="search-btn" id="searchBtn">
             <i class="ph ph-magnifying-glass"></i>
           </button>
+        </div>
+        <div class="search-dropdown" id="searchDropdown" style="display: none;">
+          <div class="search-suggestions-section" id="searchSuggestionsSection" style="display: none;">
+            <div class="search-suggestions-header">
+              <span>Suggestions</span>
+            </div>
+            <div class="search-suggestions-list" id="searchSuggestionsList">
+            </div>
+          </div>
+          <div class="search-history-section" id="searchHistorySection">
+            <div class="search-history-header">
+              <span>Recent searches</span>
+              <button id="clearSearchHistory">Clear all</button>
+            </div>
+            <div class="search-history-list" id="searchHistoryList">
+            </div>
+          </div>
         </div>
       </div>
 
@@ -44,9 +61,43 @@
           <i class="ph ph-bell"></i>
           <span class="notification-dot"></span>
         </button>
-        <div class="user-avatar" id="userAvatar">
-          <img src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=100&h=100&fit=crop" alt="User">
+        <button class="icon-btn theme-toggle" id="themeToggle" title="Toggle theme">
+          <i class="ph ph-moon"></i>
+        </button>
+        <div class="user-menu-container" id="userMenuContainer" style="display: none;">
+          <button class="user-avatar-btn" id="userAvatarBtn">
+            <img src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=100&h=100&fit=crop" alt="User" id="userAvatarImg">
+          </button>
+          <div class="user-dropdown" id="userDropdown">
+            <div class="user-info">
+              <img src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=100&h=100&fit=crop" alt="" id="dropdownAvatar">
+              <div>
+                <span class="user-name" id="dropdownUsername">User</span>
+                <span class="user-email" id="dropdownEmail">user@example.com</span>
+              </div>
+            </div>
+            <div class="dropdown-divider"></div>
+            <a href="#" class="dropdown-item" data-route="my-channel">
+              <i class="ph-fill ph-user"></i>
+              <span>My Channel</span>
+            </a>
+            <a href="#" class="dropdown-item" data-route="studio">
+              <i class="ph-fill ph-video-camera"></i>
+              <span>Video Studio</span>
+            </a>
+            <a href="#" class="dropdown-item" data-route="settings">
+              <i class="ph-fill ph-gear"></i>
+              <span>Settings</span>
+            </a>
+            <div class="dropdown-divider"></div>
+            <button class="dropdown-item" id="logoutBtn">
+              <i class="ph-fill ph-sign-out"></i>
+              <span>Sign out</span>
+            </button>
+          </div>
         </div>
+        <button class="auth-btn" id="loginBtn">Sign In</button>
+        <button class="auth-btn auth-btn-primary" id="registerBtn">Create Account</button>
       </div>
     </header>
 
@@ -60,6 +111,10 @@
         <a href="#" class="nav-item" data-route="explore">
           <i class="ph-fill ph-compass"></i>
           <span>Explore</span>
+        </a>
+        <a href="#" class="nav-item" data-route="trending">
+          <i class="ph-fill ph-fire"></i>
+          <span>Trending</span>
         </a>
         <a href="#" class="nav-item" data-route="subscriptions">
           <i class="ph-fill ph-youtube-logo"></i>
@@ -142,6 +197,24 @@
                 <button class="control-btn" id="playbackSpeedBtn">
                   <span>1x</span>
                 </button>
+                <button class="control-btn" id="qualityBtn">
+                  <span>HD</span>
+                </button>
+                <button class="control-btn" id="pipBtn">
+                  <i class="ph ph-picture-in-picture"></i>
+                </button>
+                <button class="control-btn active" id="autoplayBtn" title="Autoplay">
+                  <i class="ph-fill ph-arrow-clockwise"></i>
+                </button>
+                <button class="control-btn" id="loopBtn" title="Loop">
+                  <i class="ph-fill ph-repeat"></i>
+                </button>
+                <button class="control-btn" id="miniPlayerBtn" title="Mini player">
+                  <i class="ph ph-corners-in"></i>
+                </button>
+                <button class="control-btn" id="theaterBtn" title="Theater mode">
+                  <i class="ph ph-corners-out"></i>
+                </button>
                 <button class="control-btn" id="fullscreenBtn">
                   <i class="ph-fill ph-corners-out"></i>
                 </button>
@@ -196,9 +269,13 @@
           <h3 class="comments-title">
             <span id="commentCount">0</span> Comments
           </h3>
-          <div class="comment-sort">
+          <div class="comment-sort" id="commentSortBtn">
             <i class="ph ph-caret-down"></i>
-            <span>Sort by</span>
+            <span id="currentSortOption">Top</span>
+          </div>
+          <div class="comment-sort-dropdown" id="commentSortDropdown" style="display: none;">
+            <button class="sort-option active" data-sort="top">Top</button>
+            <button class="sort-option" data-sort="newest">Newest</button>
           </div>
           <div class="comment-input-wrapper">
             <img src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=100&h=100&fit=crop" alt="" class="comment-avatar">
@@ -288,15 +365,589 @@
       </div>
     </div>
 
+    <!-- Mini Player -->
+    <div class="mini-player" id="miniPlayer" style="display: none;">
+      <div class="mini-player-video">
+        <video id="miniPlayerVideo" src=""></video>
+        <div class="mini-player-controls">
+          <button class="mini-play-btn" id="miniPlayBtn">
+            <i class="ph-fill ph-play"></i>
+          </button>
+          <div class="mini-progress">
+            <div class="mini-progress-bar" id="miniProgressBar"></div>
+          </div>
+          <span class="mini-time" id="miniTime">0:00</span>
+          <button class="mini-close-btn" id="miniCloseBtn">
+            <i class="ph ph-x"></i>
+          </button>
+        </div>
+      </div>
+      <div class="mini-player-info">
+        <h4 id="miniPlayerTitle">Video Title</h4>
+        <p id="miniPlayerChannel">Channel Name</p>
+      </div>
+    </div>
+
     <!-- Toast Notification -->
     <div class="toast" id="toast">
       <span class="toast-message" id="toastMessage"></span>
+    </div>
+
+    <!-- Video Options Menu -->
+    <div class="video-options-menu" id="videoOptionsMenu" style="display: none;">
+      <button class="video-option" id="editVideoBtn">
+        <i class="ph-fill ph-pencil-simple"></i>
+        <span>Edit</span>
+      </button>
+      <button class="video-option" id="deleteVideoBtn">
+        <i class="ph-fill ph-trash"></i>
+        <span>Delete</span>
+      </button>
+      <button class="video-option" id="changeVisibilityBtn">
+        <i class="ph-fill ph-eye"></i>
+        <span>Change visibility</span>
+      </button>
+    </div>
+
+    <!-- Keyboard Shortcuts Modal -->
+    <div class="modal" id="shortcutsModal" style="display: none;">
+      <div class="modal-backdrop"></div>
+      <div class="modal-content shortcuts-modal">
+        <div class="modal-header">
+          <h2>Keyboard Shortcuts</h2>
+          <button class="modal-close" id="closeShortcutsBtn">&times;</button>
+        </div>
+        <div class="modal-body">
+          <div class="shortcuts-section">
+            <h3>Playback</h3>
+            <div class="shortcut-row">
+              <span class="shortcut-key">Space</span>
+              <span>Play/Pause</span>
+            </div>
+            <div class="shortcut-row">
+              <span class="shortcut-key">←</span>
+              <span>Rewind 5 seconds</span>
+            </div>
+            <div class="shortcut-row">
+              <span class="shortcut-key">→</span>
+              <span>Forward 5 seconds</span>
+            </div>
+            <div class="shortcut-row">
+              <span class="shortcut-key">↑</span>
+              <span>Volume up</span>
+            </div>
+            <div class="shortcut-row">
+              <span class="shortcut-key">↓</span>
+              <span>Volume down</span>
+            </div>
+            <div class="shortcut-row">
+              <span class="shortcut-key">M</span>
+              <span>Mute/Unmute</span>
+            </div>
+            <div class="shortcut-row">
+              <span class="shortcut-key">F</span>
+              <span>Fullscreen</span>
+            </div>
+            <div class="shortcut-row">
+              <span class="shortcut-key">L</span>
+              <span>Loop</span>
+            </div>
+          </div>
+          <div class="shortcuts-section">
+            <h3>Navigation</h3>
+            <div class="shortcut-row">
+              <span class="shortcut-key">0-9</span>
+              <span>Jump to percentage</span>
+            </div>
+            <div class="shortcut-row">
+              <span class="shortcut-key">Home</span>
+              <span>Go to home</span>
+            </div>
+            <div class="shortcut-row">
+              <span class="shortcut-key">/</span>
+              <span>Focus search</span>
+            </div>
+            <div class="shortcut-row">
+              <span class="shortcut-key">Esc</span>
+              <span>Close player/modal</span>
+            </div>
+            <div class="shortcut-row">
+              <span class="shortcut-key">?</span>
+              <span>Show shortcuts</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Video Edit Modal -->
+    <div class="modal" id="videoEditModal" style="display: none;">
+      <div class="modal-backdrop"></div>
+      <div class="modal-content video-edit-modal">
+        <div class="modal-header">
+          <h2>Edit Video</h2>
+          <button class="modal-close" id="closeVideoEditBtn">&times;</button>
+        </div>
+        <div class="modal-body">
+          <form id="videoEditForm">
+            <div class="form-group">
+              <label for="editVideoTitle">Title</label>
+              <input type="text" id="editVideoTitle" maxlength="100" required>
+              <span class="char-count"><span id="editTitleCount">0</span>/100</span>
+            </div>
+            <div class="form-group">
+              <label for="editVideoDescription">Description</label>
+              <textarea id="editVideoDescription" rows="4" maxlength="5000" placeholder="Tell viewers about your video"></textarea>
+              <span class="char-count"><span id="editDescCount">0</span>/5000</span>
+            </div>
+            <div class="form-group">
+              <label for="editVideoCategory">Category</label>
+              <select id="editVideoCategory">
+                <option value="all">All</option>
+                <option value="gaming">Gaming</option>
+                <option value="music">Music</option>
+                <option value="tech">Tech</option>
+                <option value="sports">Sports</option>
+                <option value="cooking">Cooking</option>
+                <option value="travel">Travel</option>
+                <option value="comedy">Comedy</option>
+                <option value="education">Education</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="editVideoTags">Tags</label>
+              <input type="text" id="editVideoTags" placeholder="tag1, tag2, tag3">
+              <small>Separate tags with commas</small>
+            </div>
+            <div class="form-group">
+              <label for="editVideoVisibility">Visibility</label>
+              <select id="editVideoVisibility">
+                <option value="public">Public</option>
+                <option value="unlisted">Unlisted</option>
+                <option value="private">Private</option>
+              </select>
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button class="btn-secondary" id="cancelVideoEditBtn">Cancel</button>
+          <button class="btn-primary" id="saveVideoEditBtn">Save Changes</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Delete Confirmation Modal -->
+    <div class="modal" id="deleteConfirmModal" style="display: none;">
+      <div class="modal-backdrop"></div>
+      <div class="modal-content delete-confirm-modal">
+        <div class="modal-header">
+          <h2>Delete Video</h2>
+          <button class="modal-close" id="closeDeleteConfirmBtn">&times;</button>
+        </div>
+        <div class="modal-body">
+          <p>Are you sure you want to delete this video? This action cannot be undone.</p>
+        </div>
+        <div class="modal-footer">
+          <button class="btn-secondary" id="cancelDeleteBtn">Cancel</button>
+          <button class="btn-danger" id="confirmDeleteBtn">Delete</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Share Modal -->
+    <div class="modal" id="shareModal" style="display: none;">
+      <div class="modal-backdrop"></div>
+      <div class="modal-content share-modal">
+        <div class="modal-header">
+          <h2>Share</h2>
+          <button class="modal-close" id="closeShareBtn">&times;</button>
+        </div>
+        <div class="modal-body">
+          <div class="share-options">
+            <a href="#" class="share-option" id="shareTwitter" target="_blank">
+              <i class="ph-fill ph-x-logo"></i>
+              <span>X (Twitter)</span>
+            </a>
+            <a href="#" class="share-option" id="shareFacebook" target="_blank">
+              <i class="ph-fill ph-facebook-logo"></i>
+              <span>Facebook</span>
+            </a>
+            <a href="#" class="share-option" id="shareReddit" target="_blank">
+              <i class="ph-fill ph-reddit-logo"></i>
+              <span>Reddit</span>
+            </a>
+            <a href="#" class="share-option" id="shareWhatsApp" target="_blank">
+              <i class="ph-fill ph-whatsapp-logo"></i>
+              <span>WhatsApp</span>
+            </a>
+          </div>
+          <div class="share-link-section">
+            <label>Share link</label>
+            <div class="share-link-input">
+              <input type="text" id="shareLinkInput" readonly>
+              <button class="btn-secondary" id="copyShareLinkBtn">Copy</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Login Modal -->
+    <div class="modal-overlay" id="loginModal" style="display: none;">
+      <div class="modal auth-modal">
+        <div class="modal-header">
+          <h2>Welcome Back</h2>
+          <button class="modal-close" id="closeLoginModal">
+            <i class="ph ph-x"></i>
+          </button>
+        </div>
+        <div class="modal-body">
+          <form id="loginForm">
+            <div class="form-group">
+              <label for="loginEmail">Email</label>
+              <input type="email" id="loginEmail" placeholder="Enter your email" required>
+            </div>
+            <div class="form-group">
+              <label for="loginPassword">Password</label>
+              <div class="password-input-wrapper">
+                <input type="password" id="loginPassword" placeholder="Enter your password" required>
+                <button type="button" class="toggle-password" data-target="loginPassword">
+                  <i class="ph ph-eye"></i>
+                </button>
+              </div>
+            </div>
+            <div class="form-row">
+              <label class="checkbox-label">
+                <input type="checkbox" id="rememberMe">
+                <span>Remember me</span>
+              </label>
+              <a href="#" class="forgot-password" id="forgotPasswordBtn">Forgot password?</a>
+            </div>
+            <button type="submit" class="btn-primary btn-full">Sign In</button>
+          </form>
+          <div class="auth-footer">
+            <span>Don't have an account?</span>
+            <a href="#" id="switchToRegister">Create one</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Register Modal -->
+    <div class="modal-overlay" id="registerModal" style="display: none;">
+      <div class="modal auth-modal">
+        <div class="modal-header">
+          <h2>Create Account</h2>
+          <button class="modal-close" id="closeRegisterModal">
+            <i class="ph ph-x"></i>
+          </button>
+        </div>
+        <div class="modal-body">
+          <form id="registerForm">
+            <div class="form-group">
+              <label for="registerUsername">Username</label>
+              <input type="text" id="registerUsername" placeholder="Choose a username" required minlength="3" maxlength="20">
+              <span class="form-hint">3-20 characters</span>
+            </div>
+            <div class="form-group">
+              <label for="registerEmail">Email</label>
+              <input type="email" id="registerEmail" placeholder="Enter your email" required>
+            </div>
+            <div class="form-group">
+              <label for="registerPassword">Password</label>
+              <div class="password-input-wrapper">
+                <input type="password" id="registerPassword" placeholder="Create a password" required minlength="8">
+                <button type="button" class="toggle-password" data-target="registerPassword">
+                  <i class="ph ph-eye"></i>
+                </button>
+              </div>
+              <span class="form-hint">At least 8 characters</span>
+            </div>
+            <div class="form-group">
+              <label for="registerConfirmPassword">Confirm Password</label>
+              <input type="password" id="registerConfirmPassword" placeholder="Confirm your password" required>
+            </div>
+            <label class="checkbox-label terms-checkbox">
+              <input type="checkbox" id="agreeTerms" required>
+              <span>I agree to the <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a></span>
+            </label>
+            <button type="submit" class="btn-primary btn-full">Create Account</button>
+          </form>
+          <div class="auth-footer">
+            <span>Already have an account?</span>
+            <a href="#" id="switchToLogin">Sign in</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Forgot Password Modal -->
+    <div class="modal-overlay" id="forgotPasswordModal" style="display: none;">
+      <div class="modal auth-modal">
+        <div class="modal-header">
+          <h2>Reset Password</h2>
+          <button class="modal-close" id="closeForgotPasswordModal">
+            <i class="ph ph-x"></i>
+          </button>
+        </div>
+        <div class="modal-body">
+          <p class="auth-description">Enter your email and we'll send you a link to reset your password.</p>
+          <form id="forgotPasswordForm">
+            <div class="form-group">
+              <label for="forgotEmail">Email</label>
+              <input type="email" id="forgotEmail" placeholder="Enter your email" required>
+            </div>
+            <button type="submit" class="btn-primary btn-full">Send Reset Link</button>
+          </form>
+          <div class="auth-footer">
+            <a href="#" id="backToLogin">Back to Sign In</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Create Playlist Modal -->
+    <div class="modal-overlay" id="playlistModal" style="display: none;">
+      <div class="modal auth-modal">
+        <div class="modal-header">
+          <h2>Create Playlist</h2>
+          <button class="modal-close" id="closePlaylistModal">
+            <i class="ph ph-x"></i>
+          </button>
+        </div>
+        <div class="modal-body">
+          <form id="playlistForm">
+            <div class="form-group">
+              <label for="playlistName">Playlist Name</label>
+              <input type="text" id="playlistName" placeholder="Enter playlist name" required maxlength="100">
+            </div>
+            <div class="form-group">
+              <label for="playlistDescription">Description (optional)</label>
+              <textarea id="playlistDescription" placeholder="Add a description" maxlength="500"></textarea>
+            </div>
+            <div class="form-group">
+              <label for="playlistVisibility">Privacy</label>
+              <select id="playlistVisibility">
+                <option value="private">Private</option>
+                <option value="public">Public</option>
+                <option value="unlisted">Unlisted</option>
+              </select>
+            </div>
+            <button type="submit" class="btn-primary btn-full">Create Playlist</button>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- Save to Playlist Modal -->
+    <div class="modal-overlay" id="saveToPlaylistModal" style="display: none;">
+      <div class="modal auth-modal">
+        <div class="modal-header">
+          <h2>Save to Playlist</h2>
+          <button class="modal-close" id="closeSaveToPlaylistModal">
+            <i class="ph ph-x"></i>
+          </button>
+        </div>
+        <div class="modal-body">
+          <button class="btn-secondary btn-full" id="createNewPlaylistBtn" style="margin-bottom: 16px;">
+            <i class="ph ph-plus"></i> Create New Playlist
+          </button>
+          <div class="playlist-list" id="playlistList">
+            <!-- Playlists will be loaded here -->
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Notifications Dropdown -->
+    <div class="notifications-dropdown" id="notificationsDropdown" style="display: none;">
+      <div class="notifications-header">
+        <h3>Notifications</h3>
+        <button class="mark-all-read">Mark all as read</button>
+      </div>
+      <div class="notifications-list" id="notificationsList">
+        <div class="notification-empty">
+          <i class="ph-fill ph-bell"></i>
+          <p>No notifications yet</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Channel Page -->
+    <div class="channel-page" id="channelPage" style="display: none;">
+      <div class="channel-banner">
+        <img src="" alt="" id="channelBannerImg">
+      </div>
+      <div class="channel-header-content">
+        <div class="channel-header-row">
+          <div class="channel-info-section">
+            <img class="channel-page-avatar" id="channelPageAvatar" src="" alt="">
+            <div class="channel-page-info">
+              <h1 id="channelPageName">Channel Name</h1>
+              <p id="channelPageHandle">@handle</p>
+              <p class="channel-page-stats" id="channelPageStats">1M subscribers • 100 videos</p>
+            </div>
+          </div>
+          <div class="channel-actions">
+            <button class="channel-settings-btn" id="channelSettingsBtn" style="display: none;">
+              <i class="ph-fill ph-gear"></i>
+              <span>Settings</span>
+            </button>
+            <button class="subscribe-btn" id="channelSubscribeBtn">
+              <i class="ph-fill ph-bell"></i>
+              <span>Subscribe</span>
+            </button>
+          </div>
+        </div>
+        <div class="channel-tabs">
+          <button class="channel-tab active" data-tab="videos">Videos</button>
+          <button class="channel-tab" data-tab="playlists">Playlists</button>
+          <button class="channel-tab" data-tab="community">Community</button>
+          <button class="channel-tab" data-tab="analytics">Analytics</button>
+          <button class="channel-tab" data-tab="about">About</button>
+        </div>
+      </div>
+      <div class="channel-content" id="channelContent">
+        <!-- Channel content will be loaded here -->
+      </div>
+    </div>
+
+    <!-- Channel Settings Modal -->
+    <div class="modal" id="channelSettingsModal" style="display: none;">
+      <div class="modal-backdrop"></div>
+      <div class="modal-content channel-settings-modal">
+        <div class="modal-header">
+          <h2>Channel Settings</h2>
+          <button class="modal-close" id="closeChannelSettingsBtn">&times;</button>
+        </div>
+        <div class="modal-body">
+          <form id="channelSettingsForm">
+            <div class="form-group">
+              <label>Channel Banner</label>
+              <div class="banner-upload-area">
+                <img id="settingsBannerPreview" src="" alt="Banner preview" style="display: none;">
+                <div class="banner-placeholder" id="settingsBannerPlaceholder">
+                  <i class="ph-fill ph-image"></i>
+                  <span>Upload banner image</span>
+                </div>
+                <input type="text" id="settingsBannerUrl" placeholder="Enter banner image URL">
+              </div>
+            </div>
+            <div class="form-group">
+              <label>Channel Avatar</label>
+              <div class="avatar-upload-area">
+                <img id="settingsAvatarPreview" src="" alt="Avatar preview" class="settings-avatar-preview">
+                <input type="text" id="settingsAvatarUrl" placeholder="Enter avatar image URL">
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="settingsChannelName">Channel Name</label>
+              <input type="text" id="settingsChannelName" maxlength="50" required>
+              <span class="char-count"><span id="channelNameCount">0</span>/50</span>
+            </div>
+            <div class="form-group">
+              <label for="settingsChannelDescription">Channel Description</label>
+              <textarea id="settingsChannelDescription" rows="4" maxlength="1000" placeholder="Tell viewers about your channel"></textarea>
+              <span class="char-count"><span id="channelDescCount">0</span>/1000</span>
+            </div>
+            <div class="form-group">
+              <label for="settingsCustomUrl">Custom URL</label>
+              <input type="text" id="settingsCustomUrl" placeholder="your-channel-url">
+              <small>videoshare.com/@your-channel-url</small>
+            </div>
+            <div class="form-group">
+              <label for="settingsLocation">Location</label>
+              <input type="text" id="settingsLocation" placeholder="City, Country">
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button class="btn-secondary" id="cancelChannelSettingsBtn">Cancel</button>
+          <button class="btn-primary" id="saveChannelSettingsBtn">Save Changes</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Watch History Page -->
+    <div class="history-page" id="historyPage" style="display: none;">
+      <div class="history-header">
+        <h1>Watch History</h1>
+        <button class="btn-secondary" id="clearHistoryBtn">Clear all history</button>
+      </div>
+      <div class="video-grid" id="historyGrid">
+        <!-- History videos will be loaded here -->
+      </div>
+      <div class="empty-state" id="historyEmptyState" style="display: none;">
+        <i class="ph-fill ph-clock-counter-clockwise"></i>
+        <h3>No watch history</h3>
+        <p>Videos you watch will appear here</p>
+      </div>
+    </div>
+
+    <!-- Liked Videos Page -->
+    <div class="liked-videos-page" id="likedVideosPage" style="display: none;">
+      <div class="liked-header">
+        <h1>Liked Videos</h1>
+      </div>
+      <div class="video-grid" id="likedGrid">
+        <!-- Liked videos will be loaded here -->
+      </div>
+      <div class="empty-state" id="likedEmptyState" style="display: none;">
+        <i class="ph-fill ph-heart"></i>
+        <h3>No liked videos</h3>
+        <p>Videos you like will appear here</p>
+      </div>
+    </div>
+
+    <!-- Saved Videos Page -->
+    <div class="saved-videos-page" id="savedVideosPage" style="display: none;">
+      <div class="saved-header">
+        <h1>Saved Videos</h1>
+        <button class="tab-btn active" data-tab="all">All</button>
+        <button class="tab-btn" data-tab="watch-later">Watch Later</button>
+        <button class="tab-btn" data-tab="playlists">Playlists</button>
+      </div>
+      <div class="video-grid" id="savedGrid">
+        <!-- Saved videos will be loaded here -->
+      </div>
+      <div class="empty-state" id="savedEmptyState" style="display: none;">
+        <i class="ph-fill ph-bookmark-simple"></i>
+        <h3>No saved videos</h3>
+        <p>Save videos to watch later</p>
+      </div>
+    </div>
+
+    <!-- Subscriptions Page -->
+    <div class="subscriptions-page" id="subscriptionsPage" style="display: none;">
+      <div class="subscriptions-header">
+        <h1>Subscriptions</h1>
+      </div>
+      <div class="subscriptions-grid" id="subscriptionsGrid">
+        <!-- Subscribed channels will be loaded here -->
+      </div>
+      <div class="empty-state" id="subscriptionsEmptyState" style="display: none;">
+        <i class="ph-fill ph-users"></i>
+        <h3>No subscriptions</h3>
+        <p>Subscribe to channels to see their latest videos</p>
+      </div>
+    </div>
+
+    <!-- Trending Page -->
+    <div class="trending-page" id="trendingPage" style="display: none;">
+      <div class="trending-header">
+        <h1><i class="ph-fill ph-fire"></i> Trending</h1>
+        <p>Popular videos right now</p>
+      </div>
+      <div class="video-grid" id="trendingGrid">
+        <!-- Trending videos will be loaded here -->
+      </div>
     </div>
   </div>
 
   <script src="js/data.js"></script>
   <script src="js/utils.js"></script>
   <script src="js/components.js"></script>
+  <script src="js/auth.js"></script>
   <script src="js/app.js"></script>
 </body>
 </html>
