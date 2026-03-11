@@ -395,6 +395,12 @@ function updateVideoPlayerInfo(video) {
   subscribeBtn.classList.toggle('subscribed', video.subscribed);
   subscribeBtn.querySelector('span').textContent = video.subscribed ? 'Subscribed' : 'Subscribe';
 
+  // Show notification bell when subscribed
+  const notificationBell = document.getElementById('notificationBell');
+  if (notificationBell) {
+    notificationBell.style.display = video.subscribed ? 'flex' : 'none';
+  }
+
   const descEl = document.getElementById('videoDescription');
   const descText = video.description || '';
   const maxLength = 150;

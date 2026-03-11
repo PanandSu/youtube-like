@@ -3673,6 +3673,23 @@ function setupPlayerControls() {
     }
     components.updateVideoPlayerInfo(appCurrentVideo);
   });
+
+  // Notification bell
+  const notificationBell = document.getElementById('notificationBell');
+  if (notificationBell) {
+    notificationBell.addEventListener('click', () => {
+      const user = auth.getCurrentUser();
+      if (!user) {
+        openLoginModal();
+        utils.showToast('Please sign in to enable notifications');
+        return;
+      }
+
+      notificationBell.classList.toggle('active');
+      const isActive = notificationBell.classList.contains('active');
+      utils.showToast(isActive ? 'Notifications enabled' : 'Notifications disabled');
+    });
+  }
 }
 
 // Generate mock transcript for a video
