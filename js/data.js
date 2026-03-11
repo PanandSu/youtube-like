@@ -20,7 +20,8 @@ const mockVideos = [
     videoUrl: 'https://storage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4',
     likes: 45000,
     liked: false,
-    subscribed: false
+    subscribed: false,
+    live: true
   },
   {
     id: 'v2',

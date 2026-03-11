@@ -25,7 +25,7 @@ function renderVideoCard(video) {
     <article class="video-card" data-video-id="${video.id}">
       <div class="video-thumbnail">
         <img src="${video.thumbnail}" alt="${safeTitle}" loading="lazy" data-video-src="${video.videoUrl || ''}">
-        <span class="video-duration">${video.duration}</span>
+        ${video.live ? '<span class="video-live">LIVE</span>' : `<span class="video-duration">${video.duration}</span>`}
         ${watchProgress > 0 && watchProgress < 95 ? `<div class="watch-progress-bar"><div class="watch-progress" style="width: ${watchProgress}%"></div></div>` : ''}
         <button class="video-menu" aria-label="Video options">
           <i class="ph-fill ph-dots-three-vertical"></i>
