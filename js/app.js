@@ -3006,6 +3006,20 @@ async function loadVideos() {
     });
   }
 
+  // Apply type filter (currently only videos exist, but this is for future expansion)
+  if (appCurrentType !== 'all') {
+    // For now, type filter only applies to videos since we only have video data
+    // In a full implementation, this would filter channels, playlists, etc.
+    filteredVideos = filteredVideos.filter(video => {
+      switch (appCurrentType) {
+        case 'video': return true; // All current items are videos
+        case 'channel': return false; // Would show channels in future
+        case 'playlist': return false; // Would show playlists in future
+        default: return true;
+      }
+    });
+  }
+
   // Apply sort
   if (appCurrentSort !== 'relevance') {
     switch (appCurrentSort) {
