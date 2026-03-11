@@ -3062,19 +3062,8 @@ function setupPlayerControls() {
       return;
     }
 
-    // Use queue if available
-    if (typeof window.playNextInQueue === 'function' && queue.length > 0) {
-      const played = window.playNextInQueue();
-      if (played) return;
-    }
-
-    // Fallback to recommendations
-    if (appCurrentVideo && autoplayEnabled) {
-      const recommendations = utils.getRecommendations(appCurrentVideo.id, 1);
-      if (recommendations.length > 0) {
-        openVideoPlayer(recommendations[0].id);
-      }
-    }
+    // Show end screen with recommendations
+    showEndScreen();
   });
 
   playbackSpeedBtn.addEventListener('click', () => {
@@ -3832,6 +3821,62 @@ function skipAd() {
   videoElement.play();
   isPlaying = true;
   playPauseBtn.innerHTML = '<i class="ph-fill ph-pause"></i>';
+}
+
+// Show end screen with recommendations
+function showEndScreen() {
+  const endScreen = document.getElementById('videoEndScreen');
+  const endScreenGrid = document.getElementById('endScreenGrid');
+  const replayBtn = document.getElementById('replayBtn');
+
+  if (!endScreen || !endScreenGrid) return;
+
+  // Get recommendations
+  const recommendations = utils.getRecommendations(appCurrentVideo?.id || '', 3);
+
+  endScreenGrid.innerHTML = recommendations.map(video => `
+    <div class="end-screen-video" data-video-id="${video.id}">
+      <div class="end-screen-thumb">
+        <img src="${video.thumbnail}" alt="${video.title}">
+        <span class="end-screen-duration">${video.duration}</span>
+      </div>
+      <div class="end-screen-info">
+        <div class="end-screen-title">${video.title}</div>
+        <div class="end-screen-channel">${video.channel.name}</div>
+      </div>
+    </div>
+  `).join('');
+
+  // Add click handlers to recommendations
+  endScreenGrid.querySelectorAll('.end-screen-video').forEach(item => {
+    item.addEventListener('click', () => {
+      const videoId = item.dataset.videoId;
+      hideEndScreen();
+      openVideoPlayer(videoId);
+    });
+  });
+
+  // Replay button
+  if (replayBtn) {
+    replayBtn.onclick = () => {
+      hideEndScreen();
+      videoElement.currentTime = 0;
+      videoElement.play();
+      isPlaying = true;
+      playPauseBtn.innerHTML = '<i class="ph-fill ph-pause"></i>';
+    };
+  }
+
+  // Show end screen
+  endScreen.style.display = 'flex';
+}
+
+// Hide end screen
+function hideEndScreen() {
+  const endScreen = document.getElementById('videoEndScreen');
+  if (endScreen) {
+    endScreen.style.display = 'none';
+  }
 }
 
 // Toggle ad mute
