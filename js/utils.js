@@ -93,11 +93,12 @@ function generateId() {
 function filterVideos(videos, category, query) {
   return videos.filter(video => {
     const matchesCategory = category === 'all' || video.category === category;
+    const videoTags = video.tags || [];
     const matchesSearch = query === '' ||
       video.title.toLowerCase().includes(query.toLowerCase()) ||
       video.channel.name.toLowerCase().includes(query.toLowerCase()) ||
       video.description.toLowerCase().includes(query.toLowerCase()) ||
-      video.tags.some(tag => tag.toLowerCase().includes(query.toLowerCase()));
+      videoTags.some(tag => tag.toLowerCase().includes(query.toLowerCase()));
 
     return matchesCategory && matchesSearch;
   });

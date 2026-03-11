@@ -863,7 +863,7 @@ function setupEventListeners() {
         video.visibility = visibilityOrder[nextIndex];
         localStorage.setItem('videoshare_videos', JSON.stringify(videos));
         hideVideoOptionsMenu();
-        showToast(`Visibility changed to ${video.visibility}`, 'success');
+        utils.showToast(`Visibility changed to ${video.visibility}`, 'success');
       }
     });
   }
@@ -879,7 +879,7 @@ function setupEventListeners() {
         reportedAt: new Date().toISOString()
       });
       localStorage.setItem('videoshare_reports', JSON.stringify(reported));
-      showToast('Video has been reported. Thank you for your feedback!');
+      utils.showToast('Video has been reported. Thank you for your feedback!');
     });
   }
 
@@ -2755,9 +2755,9 @@ function saveChannelSettings() {
     }
 
     // Show success toast
-    showToast('Channel settings saved successfully');
+    utils.showToast('Channel settings saved successfully');
   } else {
-    showToast(result.error || 'Failed to save settings', 'error');
+    utils.showToast(result.error || 'Failed to save settings', 'error');
   }
 }
 
@@ -2839,7 +2839,7 @@ function saveVideoEdits() {
   localStorage.setItem('videoshare_videos', JSON.stringify(videos));
 
   closeVideoEditModal();
-  showToast('Video updated successfully!', 'success');
+  utils.showToast('Video updated successfully!', 'success');
 
   // Refresh current view
   if (appCurrentCategory === 'all') {
@@ -2864,7 +2864,7 @@ function deleteVideo(videoId) {
   localStorage.setItem('videoshare_videos', JSON.stringify(videos));
 
   deleteConfirmModal.style.display = 'none';
-  showToast('Video deleted successfully!', 'success');
+  utils.showToast('Video deleted successfully!', 'success');
 
   // Refresh current view
   if (appCurrentCategory === 'all') {
@@ -2875,27 +2875,6 @@ function deleteVideo(videoId) {
   if (appCurrentVideo && appCurrentVideo.id === videoId) {
     closeVideoPlayer();
   }
-}
-
-// Show toast notification
-function showToast(message, type = 'success') {
-  // Remove existing toast
-  const existingToast = document.querySelector('.toast-notification');
-  if (existingToast) existingToast.remove();
-
-  const toast = document.createElement('div');
-  toast.className = `toast-notification toast-${type}`;
-  toast.innerHTML = `
-    <i class="ph-fill ${type === 'success' ? 'ph-check-circle' : 'ph-warning-circle'}"></i>
-    <span>${message}</span>
-  `;
-  document.body.appendChild(toast);
-
-  setTimeout(() => toast.classList.add('show'), 10);
-  setTimeout(() => {
-    toast.classList.remove('show');
-    setTimeout(() => toast.remove(), 300);
-  }, 3000);
 }
 
 // Setup notification event listeners
@@ -4498,8 +4477,8 @@ function openVideoPlayer(videoId) {
     const likeBtnEl = document.getElementById('likeBtn');
     const saveBtnEl = document.getElementById('saveBtn');
 
-    likeBtnEl.classList.toggle('active', isLiked);
-    saveBtnEl.classList.toggle('active', isSaved);
+    if (likeBtnEl) likeBtnEl.classList.toggle('active', isLiked);
+    if (saveBtnEl) saveBtnEl.classList.toggle('active', isSaved);
   }
 
   // Restore playback position if available (URL timestamp takes priority over saved position)

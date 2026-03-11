@@ -484,17 +484,6 @@ function renderVideoChapters(video) {
   });
 }
 
-function parseVideoDuration(duration) {
-  if (!duration) return 0;
-  const parts = duration.split(':');
-  if (parts.length === 2) {
-    return parseInt(parts[0]) * 60 + parseInt(parts[1]);
-  } else if (parts.length === 3) {
-    return parseInt(parts[0]) * 3600 + parseInt(parts[1]) * 60 + parseInt(parts[2]);
-  }
-  return 0;
-}
-
 function formatTime(seconds) {
   const mins = Math.floor(seconds / 60);
   const secs = seconds % 60;
