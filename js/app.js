@@ -2226,6 +2226,12 @@ function openChannelPage(channelId) {
   channelAvatar.src = channel.avatar;
   channelName.textContent = channel.name;
   channelHandle.textContent = '@' + (channel.customUrl || channel.name.toLowerCase().replace(/\s+/g, ''));
+
+  // Show verified badge if channel is verified
+  const channelVerified = document.getElementById('channelVerified');
+  if (channelVerified) {
+    channelVerified.style.display = channel.verified ? 'inline-flex' : 'none';
+  }
   channelStats.textContent = utils.formatSubscribers(channel.subscribers);
 
   // Update subscribe button

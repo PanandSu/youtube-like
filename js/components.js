@@ -46,7 +46,10 @@ function renderVideoCard(video) {
         </div>
         <div class="video-info">
           <h3 class="video-title">${safeTitle}</h3>
-          <a href="#" class="video-channel" data-channel-id="${safeChannelId}">${safeChannelName}</a>
+          <a href="#" class="video-channel" data-channel-id="${safeChannelId}">
+            ${safeChannelName}
+            ${video.channel.verified ? '<span class="channel-verified"><i class="ph-fill ph-check"></i></span>' : ''}
+          </a>
           <div class="video-meta">
             <span>${utils.formatNumber(video.views)} views</span>
             <span>•</span>
@@ -56,6 +59,33 @@ function renderVideoCard(video) {
       </div>
     </article>
   `;
+}
+
+// Animate number counting up
+function animateNumber(element, targetValue, finalText) {
+  const duration = 800; // Animation duration in ms
+  const startTime = performance.now();
+  const startValue = 0;
+
+  function update(currentTime) {
+    const elapsed = currentTime - startTime;
+    const progress = Math.min(elapsed / duration, 1);
+
+    // Easing function (ease-out)
+    const easeOut = 1 - Math.pow(1 - progress, 3);
+
+    const currentValue = Math.floor(startValue + (targetValue - startValue) * easeOut);
+    element.textContent = `${utils.formatNumber(currentValue)} views`;
+
+    if (progress < 1) {
+      requestAnimationFrame(update);
+    } else {
+      element.textContent = finalText;
+    }
+  }
+
+  // Start animation
+  requestAnimationFrame(update);
 }
 
 // Parse video duration string to seconds
@@ -339,8 +369,14 @@ function renderComments(comments) {
 // Update video info in player
 function updateVideoPlayerInfo(video) {
   document.getElementById('videoTitle').textContent = video.title;
-  document.getElementById('videoViews').textContent = `${utils.formatNumber(video.views)} views`;
-  document.getElementById('likeCount').textContent = utils.formatNumber(video.likes);
+
+  // Animate view count
+  const viewCountEl = document.getElementById('videoViews');
+  animateNumber(viewCountEl, video.views, `${utils.formatNumber(video.views)} views`);
+
+  // Animate like count
+  const likeCountEl = document.getElementById('likeCount');
+  animateNumber(likeCountEl, video.likes, utils.formatNumber(video.likes));
 
   const likeBtn = document.getElementById('likeBtn');
   likeBtn.classList.toggle('active', video.liked);
@@ -348,6 +384,12 @@ function updateVideoPlayerInfo(video) {
   document.getElementById('channelAvatar').src = video.channel.avatar;
   document.getElementById('channelName').textContent = video.channel.name;
   document.getElementById('subscriberCount').textContent = utils.formatSubscribers(video.channel.subscribers);
+
+  // Show verified badge if channel is verified
+  const channelVerified = document.getElementById('channelVerified');
+  if (channelVerified) {
+    channelVerified.style.display = video.channel.verified ? 'inline-flex' : 'none';
+  }
 
   const subscribeBtn = document.getElementById('subscribeBtn');
   subscribeBtn.classList.toggle('subscribed', video.subscribed);

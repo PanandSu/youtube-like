@@ -863,6 +863,24 @@ img {
   color: var(--accent-primary);
 }
 
+.channel-verified {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 14px;
+  height: 14px;
+  background: var(--accent-primary);
+  color: var(--bg-primary);
+  border-radius: var(--radius-full);
+  margin-left: 4px;
+  vertical-align: middle;
+  font-size: 10px;
+}
+
+.channel-verified i {
+  font-size: 8px;
+}
+
 .video-meta {
   font-size: 13px;
   color: var(--text-muted);

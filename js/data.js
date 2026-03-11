@@ -11,7 +11,8 @@ const mockVideos = [
       id: 'c1',
       name: 'CodeMaster Pro',
       avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop',
-      subscribers: 2500000
+      subscribers: 2500000,
+      verified: true
     },
     description: 'Learn how to build a complete web application from scratch using modern technologies. We cover everything from setup to deployment.',
     tags: ['coding', 'web development', 'tutorial'],
@@ -32,7 +33,8 @@ const mockVideos = [
       id: 'c2',
       name: 'Gaming Insider',
       avatar: 'https://images.unsplash.com/photo-1522075469751-3a3694fb2c61?w=100&h=100&fit=crop',
-      subscribers: 5200000
+      subscribers: 5200000,
+      verified: true
     },
     description: 'The most incredible gaming moments captured this year. From clutch plays to hilarious glitches, this compilation has it all!',
     tags: ['gaming', 'highlights', 'compilation'],
