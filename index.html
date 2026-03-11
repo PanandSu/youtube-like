@@ -168,6 +168,44 @@
           <button class="filter-option" data-duration="medium">4 - 20 minutes</button>
           <button class="filter-option" data-duration="long">Over 20 minutes</button>
         </div>
+
+        <button class="filter-btn" id="uploadDateFilterBtn">
+          <i class="ph ph-calendar"></i>
+          <span>Upload date</span>
+          <i class="ph ph-caret-down"></i>
+        </button>
+        <div class="filter-dropdown" id="uploadDateFilterDropdown" style="display: none;">
+          <button class="filter-option active" data-upload-date="all">Any time</button>
+          <button class="filter-option" data-upload-date="hour">Last hour</button>
+          <button class="filter-option" data-upload-date="today">Today</button>
+          <button class="filter-option" data-upload-date="week">This week</button>
+          <button class="filter-option" data-upload-date="month">This month</button>
+          <button class="filter-option" data-upload-date="year">This year</button>
+        </div>
+
+        <button class="filter-btn" id="sortFilterBtn">
+          <i class="ph ph-sort-ascending"></i>
+          <span>Sort by</span>
+          <i class="ph ph-caret-down"></i>
+        </button>
+        <div class="filter-dropdown" id="sortFilterDropdown" style="display: none;">
+          <button class="filter-option active" data-sort="relevance">Relevance</button>
+          <button class="filter-option" data-sort="date">Upload date</button>
+          <button class="filter-option" data-sort="views">View count</button>
+          <button class="filter-option" data-sort="rating">Rating</button>
+        </div>
+
+        <button class="filter-btn" id="typeFilterBtn">
+          <i class="ph ph-video"></i>
+          <span>Type</span>
+          <i class="ph ph-caret-down"></i>
+        </button>
+        <div class="filter-dropdown" id="typeFilterDropdown" style="display: none;">
+          <button class="filter-option active" data-type="all">All</button>
+          <button class="filter-option" data-type="video">Video</button>
+          <button class="filter-option" data-type="channel">Channel</button>
+          <button class="filter-option" data-type="playlist">Playlist</button>
+        </div>
       </div>
 
       <!-- Continue Watching Section -->
@@ -1110,6 +1148,151 @@
     </div>
 
     <!-- Subscriptions Page -->
+    <!-- Studio Page -->
+    <div class="studio-page" id="studioPage" style="display: none;">
+      <div class="studio-container">
+        <div class="studio-header">
+          <h1><i class="ph-fill ph-chart-line-up"></i> Creator Studio</h1>
+          <p>Manage your channel and track performance</p>
+        </div>
+
+        <div class="studio-stats-grid">
+          <div class="studio-stat-card">
+            <i class="ph-fill ph-eye"></i>
+            <div class="stat-value" id="totalViews">12.5M</div>
+            <div class="stat-label">Total Views</div>
+          </div>
+          <div class="studio-stat-card">
+            <i class="ph-fill ph-users"></i>
+            <div class="stat-value" id="totalSubscribers">125K</div>
+            <div class="stat-label">Subscribers</div>
+          </div>
+          <div class="studio-stat-card">
+            <i class="ph-fill ph-clock"></i>
+            <div class="stat-value" id="totalWatchTime">2.5M</div>
+            <div class="stat-label">Watch Time (hours)</div>
+          </div>
+          <div class="studio-stat-card">
+            <i class="ph-fill ph-currency-dollar"></i>
+            <div class="stat-value" id="estimatedEarnings">$3,450</div>
+            <div class="stat-label">Est. Earnings</div>
+          </div>
+        </div>
+
+        <div class="studio-content">
+          <div class="studio-sidebar">
+            <button class="studio-nav-item active" data-studio-tab="dashboard">
+              <i class="ph-fill ph-house"></i>
+              <span>Dashboard</span>
+            </button>
+            <button class="studio-nav-item" data-studio-tab="content">
+              <i class="ph-fill ph-video-camera"></i>
+              <span>Content</span>
+            </button>
+            <button class="studio-nav-item" data-studio-tab="analytics">
+              <i class="ph-fill ph-chart-bar"></i>
+              <span>Analytics</span>
+            </button>
+            <button class="studio-nav-item" data-studio-tab="comments">
+              <i class="ph-fill ph-chat-dots"></i>
+              <span>Comments</span>
+            </button>
+          </div>
+
+          <div class="studio-main">
+            <section class="studio-section active" id="studioDashboard">
+              <h2>Channel Performance</h2>
+              <div class="performance-chart">
+                <div class="chart-placeholder">
+                  <i class="ph ph-chart-line"></i>
+                  <p>Views over last 30 days</p>
+                </div>
+              </div>
+              <div class="recent-videos-section">
+                <h3>Recent Videos</h3>
+                <div class="recent-videos-list" id="recentVideosList">
+                </div>
+              </div>
+            </section>
+
+            <section class="studio-section" id="studioContent">
+              <h2>Your Videos</h2>
+              <div class="content-filters">
+                <button class="content-filter active" data-filter="all">All</button>
+                <button class="content-filter" data-filter="public">Public</button>
+                <button class="content-filter" data-filter="private">Private</button>
+                <button class="content-filter" data-filter="draft">Drafts</button>
+              </div>
+              <div class="videos-table">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Video</th>
+                      <th>Visibility</th>
+                      <th>Views</th>
+                      <th>Likes</th>
+                      <th>Comments</th>
+                      <th>Date</th>
+                    </tr>
+                  </thead>
+                  <tbody id="videosTableBody">
+                  </tbody>
+                </table>
+              </div>
+            </section>
+
+            <section class="studio-section" id="studioAnalytics">
+              <h2>Analytics</h2>
+              <div class="analytics-cards">
+                <div class="analytics-card">
+                  <h3>Top Performing Video</h3>
+                  <div class="top-video">
+                    <img src="https://images.unsplash.com/photo-1542751371-adc38448a05e?w=200&h=120&fit=crop" alt="">
+                    <div class="top-video-info">
+                      <h4>Top 10 Gaming Moments</h4>
+                      <span>3.5M views</span>
+                    </div>
+                  </div>
+                </div>
+                <div class="analytics-card">
+                  <h3>Audience Retention</h3>
+                  <p>Average: 65%</p>
+                </div>
+                <div class="analytics-card">
+                  <h3>Traffic Sources</h3>
+                  <ul>
+                    <li>YouTube Search: 45%</li>
+                    <li>Suggested Videos: 30%</li>
+                    <li>External: 15%</li>
+                    <li>Browse Features: 10%</li>
+                  </ul>
+                </div>
+              </div>
+            </section>
+
+            <section class="studio-section" id="studioComments">
+              <h2>Recent Comments</h2>
+              <div class="comments-management" id="commentsManagement">
+                <div class="comment-item">
+                  <img src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=50&h=50&fit=crop" alt="">
+                  <div class="comment-content">
+                    <span class="comment-author">John Doe</span>
+                    <p>Great video! Really helped me understand the topic.</p>
+                    <span class="comment-date">2 hours ago</span>
+                  </div>
+                  <div class="comment-actions">
+                    <button class="btn-icon" title="Approve"><i class="ph-fill ph-check"></i></button>
+                    <button class="btn-icon" title="Spam"><i class="ph-fill ph-warning"></i></button>
+                    <button class="btn-icon" title="Delete"><i class="ph-fill ph-trash"></i></button>
+                  </div>
+                </div>
+              </div>
+            </section>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <div class="subscriptions-page" id="subscriptionsPage" style="display: none;">
       <div class="subscriptions-header">
         <h1>Subscriptions</h1>
@@ -1122,6 +1305,110 @@
         <h3>No subscriptions</h3>
         <p>Subscribe to channels to see their latest videos</p>
       </div>
+    </div>
+
+    <!-- Explore Page -->
+    <div class="explore-page" id="explorePage" style="display: none;">
+      <div class="explore-header">
+        <h1><i class="ph-fill ph-compass"></i> Explore</h1>
+        <p>Discover new content</p>
+      </div>
+
+      <!-- Trending Topics -->
+      <section class="trending-topics-section">
+        <h2><i class="ph-fill ph-fire"></i> Trending Topics</h2>
+        <div class="trending-topics-grid" id="trendingTopicsGrid">
+          <button class="trending-topic-card" data-topic="gaming">
+            <i class="ph-fill ph-game-controller"></i>
+            <span>Gaming</span>
+          </button>
+          <button class="trending-topic-card" data-topic="music">
+            <i class="ph-fill ph-music-notes"></i>
+            <span>Music</span>
+          </button>
+          <button class="trending-topic-card" data-topic="tech">
+            <i class="ph-fill ph-laptop"></i>
+            <span>Tech</span>
+          </button>
+          <button class="trending-topic-card" data-topic="sports">
+            <i class="ph-fill ph-trophy"></i>
+            <span>Sports</span>
+          </button>
+          <button class="trending-topic-card" data-topic="cooking">
+            <i class="ph-fill ph-cooking-pot"></i>
+            <span>Cooking</span>
+          </button>
+          <button class="trending-topic-card" data-topic="travel">
+            <i class="ph-fill ph-airplane"></i>
+            <span>Travel</span>
+          </button>
+          <button class="trending-topic-card" data-topic="fashion">
+            <i class="ph-fill ph-tshirt"></i>
+            <span>Fashion</span>
+          </button>
+          <button class="trending-topic-card" data-topic="science">
+            <i class="ph-fill ph-atom"></i>
+            <span>Science</span>
+          </button>
+        </div>
+      </section>
+
+      <!-- Popular Categories -->
+      <section class="popular-categories-section">
+        <h2><i class="ph-fill ph-grid-nine"></i> Browse Categories</h2>
+        <div class="categories-grid" id="exploreCategoriesGrid">
+          <button class="category-card" data-category="all">
+            <img src="https://images.unsplash.com/photo-1579546929518-9e396f3cc809?w=200&h=150&fit=crop" alt="All">
+            <span>All</span>
+          </button>
+          <button class="category-card" data-category="gaming">
+            <img src="https://images.unsplash.com/photo-1542751371-adc38448a05e?w=200&h=150&fit=crop" alt="Gaming">
+            <span>Gaming</span>
+          </button>
+          <button class="category-card" data-category="music">
+            <img src="https://images.unsplash.com/photo-1510915361894-db8b60106cb1?w=200&h=150&fit=crop" alt="Music">
+            <span>Music</span>
+          </button>
+          <button class="category-card" data-category="tech">
+            <img src="https://images.unsplash.com/photo-1461749280684-dccba630e2f6?w=200&h=150&fit=crop" alt="Tech">
+            <span>Tech</span>
+          </button>
+          <button class="category-card" data-category="sports">
+            <img src="https://images.unsplash.com/photo-1546519638-68e109498ffc?w=200&h=150&fit=crop" alt="Sports">
+            <span>Sports</span>
+          </button>
+          <button class="category-card" data-category="cooking">
+            <img src="https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=200&h=150&fit=crop" alt="Cooking">
+            <span>Cooking</span>
+          </button>
+          <button class="category-card" data-category="travel">
+            <img src="https://images.unsplash.com/photo-1488646953014-85cb44e25828?w=200&h=150&fit=crop" alt="Travel">
+            <span>Travel</span>
+          </button>
+          <button class="category-card" data-category="comedy">
+            <img src="https://images.unsplash.com/photo-1527224538127-2104bb71c51b?w=200&h=150&fit=crop" alt="Comedy">
+            <span>Comedy</span>
+          </button>
+          <button class="category-card" data-category="education">
+            <img src="https://images.unsplash.com/photo-1503676260728-1c00da094a0b?w=200&h=150&fit=crop" alt="Education">
+            <span>Education</span>
+          </button>
+        </div>
+      </section>
+
+      <!-- Featured Channels -->
+      <section class="featured-channels-section">
+        <h2><i class="ph-fill ph-star"></i> Featured Channels</h2>
+        <div class="featured-channels-grid" id="featuredChannelsGrid">
+        </div>
+      </section>
+
+      <!-- Trending Videos -->
+      <section class="trending-videos-section">
+        <h2><i class="ph-fill ph-chart-line-up"></i> Trending Now</h2>
+        <div class="video-grid" id="exploreTrendingGrid">
+        </div>
+      </section>
     </div>
 
     <!-- Trending Page -->
@@ -1143,6 +1430,383 @@
       </div>
       <div class="shorts-grid" id="shortsGrid">
         <!-- Shorts will be loaded here -->
+      </div>
+    </div>
+
+    <!-- Settings Page -->
+    <div class="settings-page" id="settingsPage" style="display: none;">
+      <div class="settings-container">
+        <div class="settings-header">
+          <h1><i class="ph-fill ph-gear"></i> Settings</h1>
+          <p>Manage your account and preferences</p>
+        </div>
+
+        <div class="settings-layout">
+          <aside class="settings-sidebar">
+            <button class="settings-nav-item active" data-section="account">
+              <i class="ph-fill ph-user"></i>
+              <span>Account</span>
+            </button>
+            <button class="settings-nav-item" data-section="privacy">
+              <i class="ph-fill ph-lock-key"></i>
+              <span>Privacy</span>
+            </button>
+            <button class="settings-nav-item" data-section="playback">
+              <i class="ph-fill ph-play-circle"></i>
+              <span>Playback</span>
+            </button>
+            <button class="settings-nav-item" data-section="notifications">
+              <i class="ph-fill ph-bell"></i>
+              <span>Notifications</span>
+            </button>
+            <button class="settings-nav-item" data-section="appearance">
+              <i class="ph-fill ph-palette"></i>
+              <span>Appearance</span>
+            </button>
+            <button class="settings-nav-item" data-section="language">
+              <i class="ph-fill ph-globe"></i>
+              <span>Language</span>
+            </button>
+            <button class="settings-nav-item" data-section="location">
+              <i class="ph-fill ph-map-pin"></i>
+              <span>Location</span>
+            </button>
+          </aside>
+
+          <div class="settings-content">
+            <!-- Account Settings -->
+            <section class="settings-section active" id="settingsAccount">
+              <h2>Account Settings</h2>
+
+              <div class="settings-card">
+                <h3>Profile Information</h3>
+                <div class="settings-form-group">
+                  <label>Profile Picture</label>
+                  <div class="profile-picture-settings">
+                    <img id="settingsProfileAvatar" src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=100&h=100&fit=crop" alt="Profile">
+                    <button class="btn-secondary" id="changeProfilePhoto">Change Photo</button>
+                  </div>
+                </div>
+                <div class="settings-form-group">
+                  <label for="settingsDisplayName">Display Name</label>
+                  <input type="text" id="settingsDisplayName" value="User" maxlength="50">
+                </div>
+                <div class="settings-form-group">
+                  <label for="settingsEmail">Email</label>
+                  <input type="email" id="settingsEmail" value="user@example.com">
+                </div>
+                <div class="settings-form-group">
+                  <label for="settingsUsername">Username</label>
+                  <input type="text" id="settingsUsername" value="@user" maxlength="20">
+                </div>
+              </div>
+
+              <div class="settings-card">
+                <h3>Change Password</h3>
+                <div class="settings-form-group">
+                  <label for="settingsCurrentPassword">Current Password</label>
+                  <input type="password" id="settingsCurrentPassword" placeholder="Enter current password">
+                </div>
+                <div class="settings-form-group">
+                  <label for="settingsNewPassword">New Password</label>
+                  <input type="password" id="settingsNewPassword" placeholder="Enter new password">
+                </div>
+                <div class="settings-form-group">
+                  <label for="settingsConfirmPassword">Confirm New Password</label>
+                  <input type="password" id="settingsConfirmPassword" placeholder="Confirm new password">
+                </div>
+                <button class="btn-primary" id="changePasswordBtn">Update Password</button>
+              </div>
+
+              <div class="settings-card danger-zone">
+                <h3>Danger Zone</h3>
+                <p>Once you delete your account, there is no going back. Please be certain.</p>
+                <button class="btn-danger" id="deleteAccountBtn">Delete Account</button>
+              </div>
+            </section>
+
+            <!-- Privacy Settings -->
+            <section class="settings-section" id="settingsPrivacy">
+              <h2>Privacy Settings</h2>
+
+              <div class="settings-card">
+                <h3>Watch History</h3>
+                <div class="settings-toggle">
+                  <div class="toggle-info">
+                    <span class="toggle-label">Save watch history</span>
+                    <span class="toggle-description">Allow us to save your watch history to improve recommendations</span>
+                  </div>
+                  <label class="toggle-switch">
+                    <input type="checkbox" id="saveWatchHistory" checked>
+                    <span class="toggle-slider"></span>
+                  </label>
+                </div>
+              </div>
+
+              <div class="settings-card">
+                <h3>Search History</h3>
+                <div class="settings-toggle">
+                  <div class="toggle-info">
+                    <span class="toggle-label">Save search history</span>
+                    <span class="toggle-description">Save your searches for better suggestions</span>
+                  </div>
+                  <label class="toggle-switch">
+                    <input type="checkbox" id="saveSearchHistory" checked>
+                    <span class="toggle-slider"></span>
+                  </label>
+                </div>
+                <button class="btn-secondary" id="clearSearchHistoryBtn">Clear Search History</button>
+              </div>
+
+              <div class="settings-card">
+                <h3>Profile Visibility</h3>
+                <div class="settings-toggle">
+                  <div class="toggle-info">
+                    <span class="toggle-label">Public Profile</span>
+                    <span class="toggle-description">Allow others to see your channel</span>
+                  </div>
+                  <label class="toggle-switch">
+                    <input type="checkbox" id="publicProfile" checked>
+                    <span class="toggle-slider"></span>
+                  </label>
+                </div>
+                <div class="settings-toggle">
+                  <div class="toggle-info">
+                    <span class="toggle-label">Show Subscriber Count</span>
+                    <span class="toggle-description">Display your subscriber count publicly</span>
+                  </div>
+                  <label class="toggle-switch">
+                    <input type="checkbox" id="showSubscriberCount" checked>
+                    <span class="toggle-slider"></span>
+                  </label>
+                </div>
+              </div>
+            </section>
+
+            <!-- Playback Settings -->
+            <section class="settings-section" id="settingsPlayback">
+              <h2>Playback Settings</h2>
+
+              <div class="settings-card">
+                <h3>Video Quality</h3>
+                <div class="settings-form-group">
+                  <label for="defaultQuality">Default Quality</label>
+                  <select id="defaultQuality">
+                    <option value="auto">Auto</option>
+                    <option value="1080p">1080p HD</option>
+                    <option value="720p">720p</option>
+                    <option value="480p">480p</option>
+                    <option value="360p">360p</option>
+                  </select>
+                </div>
+                <div class="settings-toggle">
+                  <div class="toggle-info">
+                    <span class="toggle-label">Auto-play Videos</span>
+                    <span class="toggle-description">Automatically play the next video</span>
+                  </div>
+                  <label class="toggle-switch">
+                    <input type="checkbox" id="autoplayVideos" checked>
+                    <span class="toggle-slider"></span>
+                  </label>
+                </div>
+              </div>
+
+              <div class="settings-card">
+                <h3>Playback Speed</h3>
+                <div class="settings-form-group">
+                  <label for="defaultPlaybackSpeed">Default Speed</label>
+                  <select id="defaultPlaybackSpeed">
+                    <option value="0.5">0.5x</option>
+                    <option value="0.75">0.75x</option>
+                    <option value="1" selected>1x (Normal)</option>
+                    <option value="1.25">1.25x</option>
+                    <option value="1.5">1.5x</option>
+                    <option value="1.75">1.75x</option>
+                    <option value="2">2x</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="settings-card">
+                <h3>Captions</h3>
+                <div class="settings-toggle">
+                  <div class="toggle-info">
+                    <span class="toggle-label">Show Captions</span>
+                    <span class="toggle-description">Display closed captions when available</span>
+                  </div>
+                  <label class="toggle-switch">
+                    <input type="checkbox" id="showCaptions">
+                    <span class="toggle-slider"></span>
+                  </label>
+                </div>
+                <div class="settings-form-group">
+                  <label for="captionStyle">Caption Style</label>
+                  <select id="captionStyle">
+                    <option value="default">Default</option>
+                    <option value="white">White</option>
+                    <option value="yellow">Yellow</option>
+                    <option value="green">Green</option>
+                  </select>
+                </div>
+              </div>
+            </section>
+
+            <!-- Notifications Settings -->
+            <section class="settings-section" id="settingsNotifications">
+              <h2>Notification Settings</h2>
+
+              <div class="settings-card">
+                <h3>Email Notifications</h3>
+                <div class="settings-toggle">
+                  <div class="toggle-info">
+                    <span class="toggle-label">Video Updates</span>
+                    <span class="toggle-description">Get notified when channels you subscribe to upload</span>
+                  </div>
+                  <label class="toggle-switch">
+                    <input type="checkbox" id="emailVideoUpdates" checked>
+                    <span class="toggle-slider"></span>
+                  </label>
+                </div>
+                <div class="settings-toggle">
+                  <div class="toggle-info">
+                    <span class="toggle-label">Comments</span>
+                    <span class="toggle-description">Get notified about comments on your videos</span>
+                  </div>
+                  <label class="toggle-switch">
+                    <input type="checkbox" id="emailComments" checked>
+                    <span class="toggle-slider"></span>
+                  </label>
+                </div>
+                <div class="settings-toggle">
+                  <div class="toggle-info">
+                    <span class="toggle-label">Recommendations</span>
+                    <span class="toggle-description">Receive personalized video recommendations</span>
+                  </div>
+                  <label class="toggle-switch">
+                    <input type="checkbox" id="emailRecommendations">
+                    <span class="toggle-slider"></span>
+                  </label>
+                </div>
+              </div>
+
+              <div class="settings-card">
+                <h3>Push Notifications</h3>
+                <div class="settings-toggle">
+                  <div class="toggle-info">
+                    <span class="toggle-label">Enable Push Notifications</span>
+                    <span class="toggle-description">Receive notifications in your browser</span>
+                  </div>
+                  <label class="toggle-switch">
+                    <input type="checkbox" id="pushNotifications">
+                    <span class="toggle-slider"></span>
+                  </label>
+                </div>
+              </div>
+            </section>
+
+            <!-- Appearance Settings -->
+            <section class="settings-section" id="settingsAppearance">
+              <h2>Appearance Settings</h2>
+
+              <div class="settings-card">
+                <h3>Theme</h3>
+                <div class="theme-options">
+                  <button class="theme-option active" data-theme="dark">
+                    <i class="ph-fill ph-moon"></i>
+                    <span>Dark</span>
+                  </button>
+                  <button class="theme-option" data-theme="light">
+                    <i class="ph-fill ph-sun"></i>
+                    <span>Light</span>
+                  </button>
+                  <button class="theme-option" data-theme="system">
+                    <i class="ph-fill ph-monitor"></i>
+                    <span>System</span>
+                  </button>
+                </div>
+              </div>
+
+              <div class="settings-card">
+                <h3>Sidebar</h3>
+                <div class="settings-toggle">
+                  <div class="toggle-info">
+                    <span class="toggle-label">Auto-collapse Sidebar</span>
+                    <span class="toggle-description">Automatically collapse sidebar on small screens</span>
+                  </div>
+                  <label class="toggle-switch">
+                    <input type="checkbox" id="autoCollapseSidebar" checked>
+                    <span class="toggle-slider"></span>
+                  </label>
+                </div>
+              </div>
+            </section>
+
+            <!-- Language Settings -->
+            <section class="settings-section" id="settingsLanguage">
+              <h2>Language Settings</h2>
+
+              <div class="settings-card">
+                <h3>Display Language</h3>
+                <div class="settings-form-group">
+                  <label for="displayLanguage">Choose your preferred language</label>
+                  <select id="displayLanguage">
+                    <option value="en" selected>English</option>
+                    <option value="es">Español</option>
+                    <option value="fr">Français</option>
+                    <option value="de">Deutsch</option>
+                    <option value="it">Italiano</option>
+                    <option value="pt">Português</option>
+                    <option value="ja">日本語</option>
+                    <option value="ko">한국어</option>
+                    <option value="zh">中文</option>
+                  </select>
+                </div>
+              </div>
+            </section>
+
+            <!-- Location Settings -->
+            <section class="settings-section" id="settingsLocation">
+              <h2>Location Settings</h2>
+
+              <div class="settings-card">
+                <h3>Country</h3>
+                <div class="settings-form-group">
+                  <label for="userCountry">Select your country</label>
+                  <select id="userCountry">
+                    <option value="us" selected>United States</option>
+                    <option value="uk">United Kingdom</option>
+                    <option value="ca">Canada</option>
+                    <option value="au">Australia</option>
+                    <option value="de">Germany</option>
+                    <option value="fr">France</option>
+                    <option value="jp">Japan</option>
+                    <option value="br">Brazil</option>
+                    <option value="in">India</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="settings-card">
+                <h3>Restricted Mode</h3>
+                <div class="settings-toggle">
+                  <div class="toggle-info">
+                    <span class="toggle-label">Enable Restricted Mode</span>
+                    <span class="toggle-description">Filter out potentially mature content</span>
+                  </div>
+                  <label class="toggle-switch">
+                    <input type="checkbox" id="restrictedMode">
+                    <span class="toggle-slider"></span>
+                  </label>
+                </div>
+              </div>
+            </section>
+          </div>
+        </div>
+
+        <div class="settings-footer">
+          <button class="btn-secondary" id="resetSettingsBtn">Reset to Defaults</button>
+          <button class="btn-primary" id="saveSettingsBtn">Save Changes</button>
+        </div>
       </div>
     </div>
   </div>

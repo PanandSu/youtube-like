@@ -69,6 +69,9 @@ const savedVideosPage = document.getElementById('savedVideosPage');
 const subscriptionsPage = document.getElementById('subscriptionsPage');
 const trendingPage = document.getElementById('trendingPage');
 const shortsPage = document.getElementById('shortsPage');
+const explorePage = document.getElementById('explorePage');
+const settingsPage = document.getElementById('settingsPage');
+const studioPage = document.getElementById('studioPage');
 const playlistPage = document.getElementById('playlistPage');
 
 // Player elements
@@ -153,6 +156,9 @@ let currentSpeedIndex = 2; // 1x
 let appCurrentVideo = null;
 let appCurrentCategory = 'all';
 let appCurrentDuration = 'all';
+let appCurrentUploadDate = 'all';
+let appCurrentSort = 'relevance';
+let appCurrentType = 'all';
 let appSearchQuery = '';
 let currentRoute = 'home';
 
@@ -581,6 +587,105 @@ function setupEventListeners() {
       durationFilterDropdown.style.display = 'none';
     }
   });
+
+  // Upload Date Filter
+  const uploadDateFilterBtn = document.getElementById('uploadDateFilterBtn');
+  const uploadDateFilterDropdown = document.getElementById('uploadDateFilterDropdown');
+
+  if (uploadDateFilterBtn && uploadDateFilterDropdown) {
+    uploadDateFilterBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      uploadDateFilterDropdown.style.display = uploadDateFilterDropdown.style.display === 'none' ? 'block' : 'none';
+    });
+
+    uploadDateFilterDropdown.addEventListener('click', (e) => {
+      const option = e.target.closest('.filter-option');
+      if (!option) return;
+
+      uploadDateFilterDropdown.querySelectorAll('.filter-option').forEach(o => o.classList.remove('active'));
+      option.classList.add('active');
+
+      appCurrentUploadDate = option.dataset.uploadDate;
+      uploadDateFilterDropdown.style.display = 'none';
+
+      const span = uploadDateFilterBtn.querySelector('span');
+      if (span) span.textContent = option.textContent;
+
+      loadVideos();
+    });
+
+    document.addEventListener('click', (e) => {
+      if (!uploadDateFilterBtn.contains(e.target) && !uploadDateFilterDropdown.contains(e.target)) {
+        uploadDateFilterDropdown.style.display = 'none';
+      }
+    });
+  }
+
+  // Sort Filter
+  const sortFilterBtn = document.getElementById('sortFilterBtn');
+  const sortFilterDropdown = document.getElementById('sortFilterDropdown');
+
+  if (sortFilterBtn && sortFilterDropdown) {
+    sortFilterBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      sortFilterDropdown.style.display = sortFilterDropdown.style.display === 'none' ? 'block' : 'none';
+    });
+
+    sortFilterDropdown.addEventListener('click', (e) => {
+      const option = e.target.closest('.filter-option');
+      if (!option) return;
+
+      sortFilterDropdown.querySelectorAll('.filter-option').forEach(o => o.classList.remove('active'));
+      option.classList.add('active');
+
+      appCurrentSort = option.dataset.sort;
+      sortFilterDropdown.style.display = 'none';
+
+      const span = sortFilterBtn.querySelector('span');
+      if (span) span.textContent = option.textContent;
+
+      loadVideos();
+    });
+
+    document.addEventListener('click', (e) => {
+      if (!sortFilterBtn.contains(e.target) && !sortFilterDropdown.contains(e.target)) {
+        sortFilterDropdown.style.display = 'none';
+      }
+    });
+  }
+
+  // Type Filter
+  const typeFilterBtn = document.getElementById('typeFilterBtn');
+  const typeFilterDropdown = document.getElementById('typeFilterDropdown');
+
+  if (typeFilterBtn && typeFilterDropdown) {
+    typeFilterBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      typeFilterDropdown.style.display = typeFilterDropdown.style.display === 'none' ? 'block' : 'none';
+    });
+
+    typeFilterDropdown.addEventListener('click', (e) => {
+      const option = e.target.closest('.filter-option');
+      if (!option) return;
+
+      typeFilterDropdown.querySelectorAll('.filter-option').forEach(o => o.classList.remove('active'));
+      option.classList.add('active');
+
+      appCurrentType = option.dataset.type;
+      typeFilterDropdown.style.display = 'none';
+
+      const span = typeFilterBtn.querySelector('span');
+      if (span) span.textContent = option.textContent;
+
+      loadVideos();
+    });
+
+    document.addEventListener('click', (e) => {
+      if (!typeFilterBtn.contains(e.target) && !typeFilterDropdown.contains(e.target)) {
+        typeFilterDropdown.style.display = 'none';
+      }
+    });
+  }
 
   // Upload modal
   uploadBtn.addEventListener('click', () => {
@@ -1589,6 +1694,21 @@ function setupNavigationEventListeners() {
     });
   });
 
+  // Dropdown item navigation (user menu)
+  document.querySelectorAll('.dropdown-item[data-route]').forEach(item => {
+    item.addEventListener('click', (e) => {
+      e.preventDefault();
+      const route = item.dataset.route;
+      handleNavigation(route);
+
+      // Close dropdown
+      const userDropdown = document.getElementById('userDropdown');
+      if (userDropdown) {
+        userDropdown.style.display = 'none';
+      }
+    });
+  });
+
   // Logo click goes home
   document.querySelector('.logo').addEventListener('click', (e) => {
     e.preventDefault();
@@ -1802,6 +1922,9 @@ function handleNavigation(route) {
   subscriptionsPage.style.display = 'none';
   trendingPage.style.display = 'none';
   shortsPage.style.display = 'none';
+  explorePage.style.display = 'none';
+  settingsPage.style.display = 'none';
+  studioPage.style.display = 'none';
 
   // Show selected page
   switch (route) {
@@ -1810,15 +1933,19 @@ function handleNavigation(route) {
       loadVideos();
       break;
     case 'explore':
-      mainContent.style.display = 'block';
-      appCurrentCategory = 'all';
-      loadVideos();
+      renderExplorePage();
       break;
     case 'trending':
       renderTrendingPage();
       break;
     case 'shorts':
       renderShortsPage();
+      break;
+    case 'settings':
+      renderSettingsPage();
+      break;
+    case 'studio':
+      renderStudioPage();
       break;
     case 'subscriptions':
       renderSubscriptionsPage();
@@ -1853,6 +1980,248 @@ function handleNavigation(route) {
 }
 
 // Render trending page
+// Explore Page
+function renderExplorePage() {
+  // Hide other pages
+  mainContent.style.display = 'none';
+  videoPlayerPage.style.display = 'none';
+  channelPage.style.display = 'none';
+  historyPage.style.display = 'none';
+  likedVideosPage.style.display = 'none';
+  savedVideosPage.style.display = 'none';
+  subscriptionsPage.style.display = 'none';
+  trendingPage.style.display = 'none';
+  shortsPage.style.display = 'none';
+  playlistPage.style.display = 'none';
+
+  // Show explore page
+  explorePage.style.display = 'block';
+
+  // Render trending topics click handlers
+  const topicCards = document.querySelectorAll('.trending-topic-card');
+  topicCards.forEach(card => {
+    card.addEventListener('click', () => {
+      const topic = card.dataset.topic;
+      appCurrentCategory = topic;
+      loadVideos();
+      handleNavigation('home');
+    });
+  });
+
+  // Render category cards click handlers
+  const categoryCards = document.querySelectorAll('.category-card');
+  categoryCards.forEach(card => {
+    card.addEventListener('click', () => {
+      const category = card.dataset.category;
+      appCurrentCategory = category;
+      loadVideos();
+      handleNavigation('home');
+    });
+  });
+
+  // Render featured channels
+  renderFeaturedChannels();
+
+  // Render trending videos
+  renderExploreTrendingVideos();
+}
+
+function renderFeaturedChannels() {
+  const grid = document.getElementById('featuredChannelsGrid');
+  const featuredChannels = [...new Set(videos.map(v => v.channel))].slice(0, 6);
+
+  grid.innerHTML = featuredChannels.map(channel => `
+    <div class="featured-channel-card" data-channel-id="${channel.id}">
+      <img src="${channel.avatar}" alt="${channel.name}">
+      <h4>${channel.name}</h4>
+      <span class="featured-subs">${formatNumber(channel.subscribers)} subscribers</span>
+      <button class="subscribe-btn" data-channel-id="${channel.id}">
+        <i class="ph-fill ph-bell"></i>
+        Subscribe
+      </button>
+    </div>
+  `).join('');
+
+  // Add click handlers
+  grid.querySelectorAll('.featured-channel-card').forEach(card => {
+    card.addEventListener('click', (e) => {
+      if (e.target.closest('.subscribe-btn')) return;
+      const channelId = card.dataset.channelId;
+      openChannelPage(channelId);
+    });
+  });
+
+  // Add subscribe handlers
+  grid.querySelectorAll('.subscribe-btn').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const channelId = btn.dataset.channelId;
+      toggleSubscribe(channelId, btn);
+    });
+  });
+}
+
+// Settings Page
+function renderSettingsPage() {
+  // Hide other pages
+  mainContent.style.display = 'none';
+  videoPlayerPage.style.display = 'none';
+  channelPage.style.display = 'none';
+  historyPage.style.display = 'none';
+  likedVideosPage.style.display = 'none';
+  savedVideosPage.style.display = 'none';
+  subscriptionsPage.style.display = 'none';
+  trendingPage.style.display = 'none';
+  shortsPage.style.display = 'none';
+  explorePage.style.display = 'none';
+
+  // Show settings page
+  settingsPage.style.display = 'block';
+
+  // Setup settings navigation
+  setupSettingsNavigation();
+}
+
+// Studio Page
+function renderStudioPage() {
+  // Hide other pages
+  mainContent.style.display = 'none';
+  videoPlayerPage.style.display = 'none';
+  channelPage.style.display = 'none';
+  historyPage.style.display = 'none';
+  likedVideosPage.style.display = 'none';
+  savedVideosPage.style.display = 'none';
+  subscriptionsPage.style.display = 'none';
+  trendingPage.style.display = 'none';
+  shortsPage.style.display = 'none';
+  explorePage.style.display = 'none';
+  settingsPage.style.display = 'none';
+
+  // Show studio page
+  studioPage.style.display = 'block';
+
+  // Setup studio navigation
+  setupStudioNavigation();
+
+  // Load recent videos
+  loadStudioRecentVideos();
+}
+
+function setupStudioNavigation() {
+  const navItems = document.querySelectorAll('.studio-nav-item');
+  const sections = document.querySelectorAll('.studio-section');
+
+  navItems.forEach(item => {
+    item.addEventListener('click', () => {
+      const tab = item.dataset.studioTab;
+
+      // Update active nav item
+      navItems.forEach(nav => nav.classList.remove('active'));
+      item.classList.add('active');
+
+      // Show corresponding section
+      sections.forEach(sec => {
+        sec.classList.remove('active');
+        if (sec.id === 'studio' + tab.charAt(0).toUpperCase() + tab.slice(1)) {
+          sec.classList.add('active');
+        }
+      });
+    });
+  });
+}
+
+function loadStudioRecentVideos() {
+  const list = document.getElementById('recentVideosList');
+  const recentVideos = videos.slice(0, 5);
+
+  list.innerHTML = recentVideos.map(video => `
+    <div class="recent-video-item">
+      <img src="${video.thumbnail}" alt="${video.title}">
+      <div class="recent-video-info">
+        <h4>${video.title.substring(0, 40)}${video.title.length > 40 ? '...' : ''}</h4>
+        <span>${utils.formatNumber(video.views)} views</span>
+      </div>
+    </div>
+  `).join('');
+
+  // Load videos table
+  const tableBody = document.getElementById('videosTableBody');
+  tableBody.innerHTML = videos.slice(0, 8).map(video => `
+    <tr>
+      <td>
+        <div class="video-cell">
+          <img src="${video.thumbnail}" alt="">
+          <span>${video.title.substring(0, 30)}</span>
+        </div>
+      </td>
+      <td><span class="visibility-badge">Public</span></td>
+      <td>${utils.formatNumber(video.views)}</td>
+      <td>${utils.formatNumber(video.likes)}</td>
+      <td>${Math.floor(video.likes * 0.05)}</td>
+      <td>${utils.timeAgo(video.uploadedAt)}</td>
+    </tr>
+  `).join('');
+}
+
+function setupSettingsNavigation() {
+  const navItems = document.querySelectorAll('.settings-nav-item');
+  const sections = document.querySelectorAll('.settings-section');
+
+  navItems.forEach(item => {
+    item.addEventListener('click', () => {
+      const section = item.dataset.section;
+
+      // Update active nav item
+      navItems.forEach(nav => nav.classList.remove('active'));
+      item.classList.add('active');
+
+      // Show corresponding section
+      sections.forEach(sec => {
+        sec.classList.remove('active');
+        if (sec.id === 'settings' + section.charAt(0).toUpperCase() + section.slice(1)) {
+          sec.classList.add('active');
+        }
+      });
+    });
+  });
+}
+
+function renderExploreTrendingVideos() {
+  const grid = document.getElementById('exploreTrendingGrid');
+  const trendingVideos = [...videos].sort((a, b) => b.views - a.views).slice(0, 12);
+
+  grid.innerHTML = trendingVideos.map(video => components.renderVideoCard(video)).join('');
+
+  // Add click handlers
+  grid.querySelectorAll('.video-card').forEach(card => {
+    card.addEventListener('click', (e) => {
+      if (!e.target.closest('.video-menu')) {
+        const videoId = card.dataset.videoId;
+        openVideoPlayer(videoId);
+      }
+    });
+
+    const menuBtn = card.querySelector('.video-menu');
+    if (menuBtn) {
+      menuBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const videoId = card.dataset.videoId;
+        showVideoOptionsMenu(videoId, e);
+      });
+    }
+  });
+
+  // Add channel click handlers
+  grid.querySelectorAll('.video-channel').forEach(channelLink => {
+    channelLink.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      const channelId = channelLink.dataset.channelId;
+      openChannelPage(channelId);
+    });
+  });
+}
+
 function renderTrendingPage() {
   const grid = document.getElementById('trendingGrid');
   const container = document.getElementById('trendingPage');
@@ -2616,6 +2985,40 @@ async function loadVideos() {
         default: return true;
       }
     });
+  }
+
+  // Apply upload date filter
+  if (appCurrentUploadDate !== 'all') {
+    const now = new Date();
+    filteredVideos = filteredVideos.filter(video => {
+      const uploadTime = new Date(video.uploadedAt);
+      const diffTime = now - uploadTime;
+      const diffDays = diffTime / (1000 * 60 * 60 * 24);
+
+      switch (appCurrentUploadDate) {
+        case 'hour': return diffDays < 1/24;
+        case 'today': return diffDays < 1;
+        case 'week': return diffDays < 7;
+        case 'month': return diffDays < 30;
+        case 'year': return diffDays < 365;
+        default: return true;
+      }
+    });
+  }
+
+  // Apply sort
+  if (appCurrentSort !== 'relevance') {
+    switch (appCurrentSort) {
+      case 'date':
+        filteredVideos.sort((a, b) => new Date(b.uploadedAt) - new Date(a.uploadedAt));
+        break;
+      case 'views':
+        filteredVideos.sort((a, b) => b.views - a.views);
+        break;
+      case 'rating':
+        filteredVideos.sort((a, b) => (b.likes || 0) - (a.likes || 0));
+        break;
+    }
   }
 
   allFilteredVideos = filteredVideos;
