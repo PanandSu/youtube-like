@@ -1108,7 +1108,7 @@ function loadChannelTab(tabName, channelId) {
     channel.avatar = user.avatar;
     channel.isOwner = true;
   } else {
-    const video = videos.find(v => v.channel.id === channelId);
+    const video = videos.find(v => v.channel && v.channel.id === channelId);
     if (video) {
       channel = { ...video.channel, isOwner: false };
     }
@@ -1118,7 +1118,7 @@ function loadChannelTab(tabName, channelId) {
 
   switch (tabName) {
     case 'videos':
-      const channelVideos = videos.filter(v => v.channel.id === channelId);
+      const channelVideos = videos.filter(v => v.channel && v.channel.id === channelId);
       if (channelVideos.length === 0) {
         content.innerHTML = '<div class="empty-state" style="display: flex;"><i class="ph-fill ph-video-camera-slash"></i><h3>No videos yet</h3><p>This channel has not uploaded any videos</p></div>';
       } else {
@@ -1178,7 +1178,7 @@ function loadChannelTab(tabName, channelId) {
               <span class="analytics-label">Subscribers</span>
             </div>
             <div class="analytics-card">
-              <span class="analytics-value">${videos.filter(v => v.channel.id === channelId).length}</span>
+              <span class="analytics-value">${videos.filter(v => v.channel && v.channel.id === channelId).length}</span>
               <span class="analytics-label">Total videos</span>
             </div>
           </div>
@@ -1733,7 +1733,7 @@ function setupNavigationEventListeners() {
       const channelId = document.getElementById('channelSubscribeBtn')?.dataset?.channelId;
 
       // Get channel's videos
-      const channelVideos = videos.filter(v => v.channel.id === channelId);
+      const channelVideos = videos.filter(v => v.channel && v.channel.id === channelId);
 
       switch (tabName) {
         case 'videos':
@@ -2603,7 +2603,7 @@ function openChannelPage(channelId) {
     channel.isOwner = true;
   } else {
     // Find in videos
-    const video = videos.find(v => v.channel.id === channelId);
+    const video = videos.find(v => v.channel && v.channel.id === channelId);
     if (video) {
       channel = { ...video.channel, isOwner: false };
     }
@@ -2660,7 +2660,7 @@ function openChannelPage(channelId) {
   }
 
   // Load channel videos
-  const channelVideos = videos.filter(v => v.channel.id === channel.id);
+  const channelVideos = videos.filter(v => v.channel && v.channel.id === channel.id);
   const content = document.getElementById('channelContent');
 
   if (channelVideos.length === 0) {
