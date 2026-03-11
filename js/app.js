@@ -1651,7 +1651,46 @@ function setupNavigationEventListeners() {
           break;
 
         case 'community':
-          content.innerHTML = '<div class="empty-state" style="display: flex;"><i class="ph-fill ph-users-three"></i><h3>No community posts</h3><p>Community posts will appear here</p></div>';
+          // Show sample community posts
+          const communityPosts = [
+            { id: 1, type: 'text', content: 'Thanks for 1M subscribers! 🎉 New video coming soon!', likes: 12500, comments: 234, time: '2 days ago' },
+            { id: 2, type: 'poll', question: 'What topic should I cover next?', options: ['React Advanced', 'Node.js Tips', 'TypeScript Basics', 'CSS Animations'], likes: 8900, comments: 156, time: '1 week ago' },
+            { id: 3, type: 'image', content: 'Behind the scenes of my new studio setup!', image: 'https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?w=800&h=450&fit=crop', likes: 15200, comments: 412, time: '2 weeks ago' }
+          ];
+
+          content.innerHTML = `
+            <div class="community-posts">
+              ${communityPosts.map(post => `
+                <div class="community-post">
+                  <div class="post-header">
+                    <img src="${videos[0]?.channel?.avatar || ''}" alt="Channel" class="post-avatar">
+                    <div class="post-info">
+                      <span class="post-channel">${videos[0]?.channel?.name || 'Channel'}</span>
+                      <span class="post-time">${post.time}</span>
+                    </div>
+                  </div>
+                  <div class="post-content">
+                    ${post.type === 'text' ? `<p>${post.content}</p>` : ''}
+                    ${post.type === 'poll' ? `
+                      <p class="poll-question">${post.question}</p>
+                      <div class="poll-options">
+                        ${post.options.map((opt, i) => `<button class="poll-option">${opt}</button>`).join('')}
+                      </div>
+                    ` : ''}
+                    ${post.type === 'image' ? `
+                      <p>${post.content}</p>
+                      <img src="${post.image}" alt="Community post" class="post-image">
+                    ` : ''}
+                  </div>
+                  <div class="post-actions">
+                    <button class="post-action"><i class="ph-fill ph-thumbs-up"></i> ${utils.formatNumber(post.likes)}</button>
+                    <button class="post-action"><i class="ph-fill ph-chat-circle"></i> ${post.comments}</button>
+                    <button class="post-action"><i class="ph-fill ph-share-network"></i> Share</button>
+                  </div>
+                </div>
+              `).join('')}
+            </div>
+          `;
           break;
 
         case 'analytics':
@@ -2590,6 +2629,75 @@ async function loadVideos() {
 
   // Render continue watching section if user is logged in
   renderContinueWatching();
+
+  // Render related channels
+  renderRelatedChannels();
+}
+
+// Render related channels
+function renderRelatedChannels() {
+  const relatedChannelsSection = document.getElementById('relatedChannels');
+  const relatedChannelsGrid = document.getElementById('relatedChannelsGrid');
+
+  if (!relatedChannelsSection || !relatedChannelsGrid) return;
+
+  // Get unique channels from videos
+  const channelMap = new Map();
+  videos.forEach(video => {
+    if (!channelMap.has(video.channel.id)) {
+      channelMap.set(video.channel.id, video.channel);
+    }
+  });
+
+  const channels = Array.from(channelMap.values()).slice(0, 6);
+
+  relatedChannelsGrid.innerHTML = channels.map(channel => `
+    <div class="related-channel-card" data-channel-id="${channel.id}">
+      <img src="${channel.avatar}" alt="${channel.name}">
+      <div class="related-channel-name">${channel.name}</div>
+      <div class="related-channel-subs">${utils.formatNumber(channel.subscribers)} subscribers</div>
+      <button class="related-channel-subscribe">Subscribe</button>
+    </div>
+  `).join('');
+
+  // Add click handlers
+  relatedChannelsGrid.querySelectorAll('.related-channel-card').forEach(card => {
+    card.addEventListener('click', (e) => {
+      if (!e.target.classList.contains('related-channel-subscribe')) {
+        const channelId = card.dataset.channelId;
+        openChannelPage(channelId);
+      }
+    });
+  });
+
+  relatedChannelsGrid.querySelectorAll('.related-channel-subscribe').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const card = btn.closest('.related-channel-card');
+      const channelId = card.dataset.channelId;
+      const channel = channels.find(c => c.id === channelId);
+
+      const user = auth.getCurrentUser();
+      if (!user) {
+        openLoginModal();
+        utils.showToast('Please sign in to subscribe');
+        return;
+      }
+
+      if (auth.isSubscribed(channelId)) {
+        auth.unsubscribeFromChannel(channelId);
+        btn.textContent = 'Subscribe';
+        btn.style.background = 'var(--accent-primary)';
+      } else {
+        auth.subscribeToChannel(channelId, channel.name, channel.avatar);
+        btn.textContent = 'Subscribed';
+        btn.style.background = 'var(--surface)';
+      }
+    });
+  });
+
+  // Show related channels
+  relatedChannelsSection.style.display = 'block';
 }
 
 // Load more videos (for infinite scroll)
