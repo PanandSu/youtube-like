@@ -4315,6 +4315,94 @@ function setupPlayerControls() {
     openSaveToPlaylistModal(appCurrentVideo.id);
   });
 
+  // Clip button
+  const clipBtn = document.getElementById('clipBtn');
+  const clipModal = document.getElementById('clipModal');
+  const closeClipBtn = document.getElementById('closeClipBtn');
+  const cancelClipBtn = document.getElementById('cancelClipBtn');
+  const saveClipBtn = document.getElementById('saveClipBtn');
+  const clipStartTime = document.getElementById('clipStartTime');
+  const clipEndTime = document.getElementById('clipEndTime');
+  const clipTitle = document.getElementById('clipTitle');
+  const clipLength = document.getElementById('clipLength');
+  const clipPreviewVideo = document.getElementById('clipPreviewVideo');
+
+  if (clipBtn) {
+    clipBtn.addEventListener('click', () => {
+      if (!appCurrentVideo || !videoElement) return;
+
+      // Set clip title from video title
+      if (clipTitle) clipTitle.value = appCurrentVideo.title.substring(0, 50);
+
+      // Set time range based on current video
+      const duration = videoElement.duration || 60;
+      if (clipStartTime) clipStartTime.value = '0:00';
+      if (clipEndTime) clipEndTime.value = utils.formatTime(Math.min(60, Math.floor(duration)));
+      updateClipLength();
+
+      // Set preview video source
+      if (clipPreviewVideo) {
+        clipPreviewVideo.src = appCurrentVideo.videoUrl || '';
+      }
+
+      // Show modal
+      if (clipModal) clipModal.style.display = 'block';
+    });
+  }
+
+  // Close clip modal
+  function closeClipModal() {
+    if (clipModal) clipModal.style.display = 'none';
+    if (clipPreviewVideo) {
+      clipPreviewVideo.pause();
+      clipPreviewVideo.src = '';
+    }
+  }
+
+  if (closeClipBtn) closeClipBtn.addEventListener('click', closeClipModal);
+  if (cancelClipBtn) cancelClipBtn.addEventListener('click', closeClipModal);
+
+  // Update clip length when times change
+  function updateClipLength() {
+    if (!clipStartTime || !clipEndTime || !clipLength) return;
+
+    const startSecs = parseTimestamp(clipStartTime.value) || 0;
+    const endSecs = parseTimestamp(clipEndTime.value) || 60;
+    const length = Math.max(0, endSecs - startSecs);
+    clipLength.textContent = length;
+  }
+
+  if (clipStartTime) clipStartTime.addEventListener('input', updateClipLength);
+  if (clipEndTime) clipEndTime.addEventListener('input', updateClipLength);
+
+  // Save clip
+  if (saveClipBtn) {
+    saveClipBtn.addEventListener('click', () => {
+      if (!appCurrentVideo) return;
+
+      const title = clipTitle?.value || appCurrentVideo.title;
+      const startSecs = parseTimestamp(clipStartTime?.value) || 0;
+      const endSecs = parseTimestamp(clipEndTime?.value) || 60;
+
+      // Create clip share URL (mock functionality)
+      const clipUrl = `${window.location.origin}${window.location.pathname}?v=${appCurrentVideo.id}&clipStart=${startSecs}&clipEnd=${endSecs}`;
+
+      // Copy to clipboard
+      navigator.clipboard.writeText(clipUrl).then(() => {
+        utils.showToast('Clip link copied to clipboard!');
+      }).catch(() => {
+        utils.showToast('Failed to copy clip link');
+      });
+
+      closeClipModal();
+    });
+  }
+
+  // Close modal on backdrop click
+  if (clipModal) {
+    clipModal.querySelector('.modal-backdrop')?.addEventListener('click', closeClipModal);
+  }
+
   // Transcript button
   const transcriptBtn = document.getElementById('transcriptBtn');
   const transcriptSection = document.getElementById('transcriptSection');

@@ -389,6 +389,10 @@
                 <i class="ph-fill ph-share-network"></i>
                 <span>Share</span>
               </button>
+              <button class="action-btn" id="clipBtn">
+                <i class="ph-fill ph-scissors"></i>
+                <span>Clip</span>
+              </button>
               <button class="action-btn" id="saveBtn">
                 <i class="ph-fill ph-bookmark-simple"></i>
                 <span>Save</span>
@@ -817,6 +821,45 @@
               <button class="btn-secondary" id="copyShareLinkBtn">Copy</button>
             </div>
           </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Clip Modal -->
+    <div class="modal" id="clipModal" style="display: none;">
+      <div class="modal-backdrop"></div>
+      <div class="modal-content clip-modal">
+        <div class="modal-header">
+          <h2>Create Clip</h2>
+          <button class="modal-close" id="closeClipBtn">&times;</button>
+        </div>
+        <div class="modal-body">
+          <div class="clip-preview">
+            <video id="clipPreviewVideo" muted></video>
+            <div class="clip-range">
+              <div class="clip-time-inputs">
+                <div class="clip-time-field">
+                  <label>Start time</label>
+                  <input type="text" id="clipStartTime" value="0:00" placeholder="0:00">
+                </div>
+                <div class="clip-time-field">
+                  <label>End time</label>
+                  <input type="text" id="clipEndTime" value="0:60" placeholder="0:60">
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="clip-info">
+            <div class="form-group">
+              <label for="clipTitle">Clip title</label>
+              <input type="text" id="clipTitle" placeholder="Enter clip title" maxlength="100">
+            </div>
+            <p class="clip-length-info">Clip length: <span id="clipLength">60</span> seconds</p>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn-secondary" id="cancelClipBtn">Cancel</button>
+          <button class="btn-primary" id="saveClipBtn">Share Clip</button>
         </div>
       </div>
     </div>
