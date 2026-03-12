@@ -6592,3 +6592,486 @@ body.theater-mode .recommendations {
     height: 250px;
   }
 }
+
+/* ============================================
+   Saved Videos / Library Page
+   ============================================ */
+.saved-tabs {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.saved-tab {
+  padding: 10px 20px;
+  background: transparent;
+  border: none;
+  color: var(--text-secondary);
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  border-radius: var(--radius-full);
+  transition: var(--transition-fast);
+}
+
+.saved-tab:hover {
+  background: var(--bg-tertiary);
+  color: var(--text-primary);
+}
+
+.saved-tab.active {
+  background: var(--accent-primary);
+  color: var(--bg-primary);
+}
+
+.saved-quick-access {
+  margin: 24px 0;
+}
+
+.saved-quick-access h2 {
+  font-size: 20px;
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.quick-access-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 16px;
+}
+
+.quick-access-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 24px 16px;
+  background: var(--bg-secondary);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: var(--transition-fast);
+  border: 1px solid transparent;
+}
+
+.quick-access-card:hover {
+  background: var(--bg-tertiary);
+  border-color: var(--accent-primary);
+}
+
+.quick-access-card i {
+  font-size: 32px;
+  color: var(--accent-primary);
+  margin-bottom: 12px;
+}
+
+.quick-access-card span {
+  font-weight: 500;
+  margin-bottom: 4px;
+}
+
+.quick-access-card .count {
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+.saved-playlists-section {
+  margin: 24px 0;
+}
+
+.saved-playlists-section .section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.saved-playlists-section h2 {
+  font-size: 20px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.playlists-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 16px;
+}
+
+.playlist-card {
+  background: var(--bg-secondary);
+  border-radius: var(--radius-md);
+  padding: 16px;
+  cursor: pointer;
+  transition: var(--transition-fast);
+}
+
+.playlist-card:hover {
+  background: var(--bg-tertiary);
+}
+
+.playlist-thumbnail {
+  position: relative;
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  aspect-ratio: 16/9;
+  background: var(--bg-tertiary);
+  margin-bottom: 12px;
+}
+
+.playlist-thumbnail img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.playlist-empty-thumb {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 32px;
+  color: var(--text-secondary);
+}
+
+.playlist-count {
+  position: absolute;
+  bottom: 8px;
+  right: 8px;
+  background: rgba(0,0,0,0.8);
+  color: white;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 12px;
+}
+
+.playlist-card h3 {
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.playlist-card p {
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+.playlist-card-large {
+  display: flex;
+  gap: 16px;
+  padding: 16px;
+  background: var(--bg-secondary);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: var(--transition-fast);
+}
+
+.playlist-card-large:hover {
+  background: var(--bg-tertiary);
+}
+
+.playlist-card-large .playlist-thumbnail {
+  width: 160px;
+  flex-shrink: 0;
+  margin-bottom: 0;
+}
+
+.playlist-card-large .playlist-info {
+  flex: 1;
+}
+
+.playlist-card-large h3 {
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.playlist-card-large p {
+  font-size: 13px;
+  color: var(--text-secondary);
+  margin-bottom: 12px;
+}
+
+.saved-videos-section h2 {
+  font-size: 20px;
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* ============================================
+   History Page
+   ============================================ */
+.history-tabs {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.history-tab {
+  padding: 10px 20px;
+  background: transparent;
+  border: none;
+  color: var(--text-secondary);
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  border-radius: var(--radius-full);
+  transition: var(--transition-fast);
+}
+
+.history-tab:hover {
+  background: var(--bg-tertiary);
+  color: var(--text-primary);
+}
+
+.history-tab.active {
+  background: var(--accent-primary);
+  color: var(--bg-primary);
+}
+
+.history-actions {
+  display: flex;
+  gap: 12px;
+  margin-left: auto;
+}
+
+.history-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+  margin: 24px 0;
+}
+
+.history-stat-card {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 20px;
+  background: var(--bg-secondary);
+  border-radius: var(--radius-md);
+}
+
+.history-stat-card i {
+  font-size: 32px;
+  color: var(--accent-primary);
+}
+
+.history-stat-card .stat-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.history-stat-card .stat-value {
+  font-size: 24px;
+  font-weight: 700;
+}
+
+.history-stat-card .stat-label {
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+
+.history-date-groups {
+  margin: 24px 0;
+}
+
+.history-date-group {
+  margin-bottom: 32px;
+}
+
+.history-date-group .date-header {
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 16px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.remove-history-btn {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 28px;
+  height: 28px;
+  border-radius: var(--radius-full);
+  background: rgba(0,0,0,0.7);
+  color: white;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: var(--transition-fast);
+}
+
+.video-card:hover .remove-history-btn {
+  opacity: 1;
+}
+
+.remove-history-btn:hover {
+  background: #ff0000;
+}
+
+/* ============================================
+   Subscriptions Page
+   ============================================ */
+.subscriptions-tabs {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.subscriptions-tab {
+  padding: 10px 20px;
+  background: transparent;
+  border: none;
+  color: var(--text-secondary);
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  border-radius: var(--radius-full);
+  transition: var(--transition-fast);
+}
+
+.subscriptions-tab:hover {
+  background: var(--bg-tertiary);
+  color: var(--text-primary);
+}
+
+.subscriptions-tab.active {
+  background: var(--accent-primary);
+  color: var(--bg-primary);
+}
+
+.subscriptions-feed {
+  margin: 24px 0;
+}
+
+.subscriptions-feed h2 {
+  font-size: 20px;
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.subscriptions-channels-section {
+  margin: 24px 0;
+}
+
+.subscriptions-channels-section h2 {
+  font-size: 20px;
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.subscriptions-notifications-section {
+  margin: 24px 0;
+}
+
+.subscriptions-notifications-section h2 {
+  font-size: 20px;
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.notifications-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.notification-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  padding: 16px;
+  background: var(--bg-secondary);
+  border-radius: var(--radius-md);
+}
+
+.notification-item i {
+  font-size: 24px;
+  color: var(--accent-primary);
+}
+
+.notification-item .notification-content {
+  flex: 1;
+}
+
+.notification-item p {
+  margin-bottom: 4px;
+}
+
+.notification-item span {
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+.subscription-card .subscribe-btn {
+  margin-top: 12px;
+  padding: 8px 16px;
+  border-radius: var(--radius-full);
+  border: 1px solid var(--border-color);
+  background: transparent;
+  color: var(--text-primary);
+  cursor: pointer;
+  transition: var(--transition-fast);
+}
+
+.subscription-card .subscribe-btn:hover {
+  background: var(--bg-tertiary);
+}
+
+.subscription-card .subscribe-btn.subscribed {
+  background: var(--accent-primary);
+  color: var(--bg-primary);
+  border-color: var(--accent-primary);
+}
+
+/* ============================================
+   Responsive
+   ============================================ */
+@media (max-width: 768px) {
+  .history-header,
+  .saved-header,
+  .subscriptions-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+  }
+
+  .history-actions {
+    margin-left: 0;
+    width: 100%;
+  }
+
+  .history-stats {
+    grid-template-columns: 1fr;
+  }
+
+  .quick-access-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .playlists-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .playlist-card-large {
+    flex-direction: column;
+  }
+
+  .playlist-card-large .playlist-thumbnail {
+    width: 100%;
+  }
+}

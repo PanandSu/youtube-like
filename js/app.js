@@ -1911,6 +1911,20 @@ function setupNavigationEventListeners() {
       utils.showToast('Watch history cleared');
     }
   });
+
+  // Pause history
+  let historyPaused = false;
+  document.getElementById('pauseHistoryBtn')?.addEventListener('click', (e) => {
+    historyPaused = !historyPaused;
+    const btn = e.currentTarget;
+    if (historyPaused) {
+      btn.innerHTML = '<i class="ph ph-play"></i> Resume History';
+      utils.showToast('Watch history paused');
+    } else {
+      btn.innerHTML = '<i class="ph ph-pause"></i> Pause History';
+      utils.showToast('Watch history resumed');
+    }
+  });
 }
 
 // Handle navigation
@@ -2975,9 +2989,39 @@ function renderLivePage() {
 }
 
 function renderSubscriptionsPage() {
+  // Hide other pages
+  mainContent.style.display = 'none';
+  videoPlayerPage.style.display = 'none';
+  channelPage.style.display = 'none';
+  historyPage.style.display = 'none';
+  likedVideosPage.style.display = 'none';
+  savedVideosPage.style.display = 'none';
+  trendingPage.style.display = 'none';
+  explorePage.style.display = 'none';
+  shortsPage.style.display = 'none';
+  gamingPage.style.display = 'none';
+  musicPage.style.display = 'none';
+  livePage.style.display = 'none';
+  playlistPage.style.display = 'none';
+
   const user = auth.getCurrentUser();
   const grid = document.getElementById('subscriptionsGrid');
+  const feedGrid = document.getElementById('subscriptionsFeedGrid');
   const emptyState = document.getElementById('subscriptionsEmptyState');
+  const notificationsSection = document.getElementById('subscriptionsNotifications');
+
+  // Setup tabs
+  const tabs = document.querySelectorAll('.subscriptions-tab');
+  tabs.forEach(tab => {
+    tab.addEventListener('click', () => {
+      tabs.forEach(t => t.classList.remove('active'));
+      tab.classList.add('active');
+      const tabName = tab.dataset.subscriptionsTab;
+
+      document.querySelector('.subscriptions-feed')?.style.setProperty('display', tabName !== 'channels' ? 'block' : 'none');
+      document.getElementById('subscriptionsChannelsSection').style.display = tabName === 'channels' ? 'block' : 'none';
+    });
+  });
 
   if (!user || !user.subscribedChannels || user.subscribedChannels.length === 0) {
     grid.innerHTML = '';
@@ -2987,18 +3031,69 @@ function renderSubscriptionsPage() {
   }
 
   emptyState.style.display = 'none';
+
+  // Render subscribed channels
   grid.innerHTML = user.subscribedChannels.map(channel => `
     <div class="subscription-card" data-channel-id="${channel.id}">
       <img src="${channel.avatar || ''}" alt="${channel.name || ''}">
       <h3>${channel.name || 'Unknown'}</h3>
-      <p>Subscribed</p>
+      <p>${utils.formatNumber(channel.subscribers || 0)} subscribers</p>
+      <button class="subscribe-btn subscribed" data-channel-id="${channel.id}">
+        <i class="ph-fill ph-bell"></i> Subscribed
+      </button>
     </div>
   `).join('');
 
+  // Render feed from subscriptions
+  if (feedGrid) {
+    const subscribedChannelIds = user.subscribedChannels.map(c => c.id);
+    const feedVideos = videos.filter(v => subscribedChannelIds.includes(v.channel?.id)).slice(0, 12);
+    const displayVideos = feedVideos.length > 0 ? feedVideos : videos.slice(0, 12);
+
+    feedGrid.innerHTML = displayVideos.map(renderVideoCard).join('');
+    feedGrid.querySelectorAll('.video-card').forEach(card => {
+      card.addEventListener('click', () => {
+        openVideoPlayer(card.dataset.videoId);
+      });
+    });
+  }
+
+  // Render recent notifications from subscriptions
+  if (notificationsSection) {
+    const notifications = [
+      { type: 'upload', channel: 'Channel 1', video: 'New Video', time: '2 hours ago' },
+      { type: 'live', channel: 'Channel 2', video: 'Live Stream', time: '1 hour ago' },
+      { type: 'upload', channel: 'Channel 3', video: 'New Video', time: '30 minutes ago' }
+    ];
+
+    notificationsSection.innerHTML = notifications.map(notif => `
+      <div class="notification-item">
+        <i class="ph-fill ph-${notif.type === 'live' ? 'broadcast' : 'video-camera'}"></i>
+        <div class="notification-content">
+          <p><strong>${notif.channel}</strong> uploaded <strong>${notif.video}</strong></p>
+          <span>${notif.time}</span>
+        </div>
+      </div>
+    `).join('');
+  }
+
   // Add click handlers
   grid.querySelectorAll('.subscription-card').forEach(card => {
-    card.addEventListener('click', () => {
+    card.addEventListener('click', (e) => {
+      if (e.target.closest('.subscribe-btn')) return;
       openChannelPage(card.dataset.channelId);
+    });
+  });
+
+  // Add unsubscribe handlers
+  grid.querySelectorAll('.subscribe-btn').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const channelId = btn.dataset.channelId;
+      auth.unsubscribeFromChannel(channelId);
+      btn.classList.remove('subscribed');
+      btn.innerHTML = '<i class="ph ph-bell"></i> Subscribe';
+      utils.showToast('Unsubscribed');
     });
   });
 
@@ -3007,12 +3102,57 @@ function renderSubscriptionsPage() {
 
 // Render history page
 function renderHistoryPage() {
+  // Hide other pages
+  mainContent.style.display = 'none';
+  videoPlayerPage.style.display = 'none';
+  channelPage.style.display = 'none';
+  likedVideosPage.style.display = 'none';
+  savedVideosPage.style.display = 'none';
+  subscriptionsPage.style.display = 'none';
+  trendingPage.style.display = 'none';
+  explorePage.style.display = 'none';
+  shortsPage.style.display = 'none';
+  gamingPage.style.display = 'none';
+  musicPage.style.display = 'none';
+  livePage.style.display = 'none';
+  playlistPage.style.display = 'none';
+
   const user = auth.getCurrentUser();
   const grid = document.getElementById('historyGrid');
   const emptyState = document.getElementById('historyEmptyState');
+  const dateGroups = document.getElementById('historyDateGroups');
+
+  // Setup tabs
+  const tabs = document.querySelectorAll('.history-tab');
+  tabs.forEach(tab => {
+    tab.addEventListener('click', () => {
+      tabs.forEach(t => t.classList.remove('active'));
+      tab.classList.add('active');
+      // Handle tab switch (mock for now)
+    });
+  });
+
+  // Calculate stats
+  const totalWatchTimeEl = document.getElementById('totalWatchTime');
+  const videosWatchedEl = document.getElementById('videosWatched');
+  const daysActiveEl = document.getElementById('daysActive');
+
+  if (user && user.watchHistory) {
+    const historyCount = user.watchHistory.length;
+    const totalMinutes = historyCount * 8; // Mock: 8 min average
+    const hours = Math.floor(totalMinutes / 60);
+    if (totalWatchTimeEl) totalWatchTimeEl.textContent = hours + ' hours';
+    if (videosWatchedEl) videosWatchedEl.textContent = historyCount;
+    if (daysActiveEl) daysActiveEl.textContent = Math.min(historyCount, 30);
+  } else {
+    if (totalWatchTimeEl) totalWatchTimeEl.textContent = '0 hours';
+    if (videosWatchedEl) videosWatchedEl.textContent = '0';
+    if (daysActiveEl) daysActiveEl.textContent = '0';
+  }
 
   if (!user || !user.watchHistory || user.watchHistory.length === 0) {
     grid.innerHTML = '';
+    dateGroups.innerHTML = '';
     emptyState.style.display = 'flex';
     historyPage.style.display = 'block';
     return;
@@ -3026,6 +3166,7 @@ function renderHistoryPage() {
 
   if (historyVideos.length === 0) {
     grid.innerHTML = '';
+    dateGroups.innerHTML = '';
     emptyState.style.display = 'flex';
     historyPage.style.display = 'block';
     return;
@@ -3033,7 +3174,50 @@ function renderHistoryPage() {
 
   emptyState.style.display = 'none';
 
-  // Render history cards with remove button
+  // Render date groups
+  const groupedByDate = {};
+  historyVideos.forEach(video => {
+    const date = new Date(video.watchedAt).toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
+    if (!groupedByDate[date]) groupedByDate[date] = [];
+    groupedByDate[date].push(video);
+  });
+
+  if (dateGroups) {
+    dateGroups.innerHTML = Object.entries(groupedByDate).map(([date, videos]) => `
+      <div class="history-date-group">
+        <h3 class="date-header">${date}</h3>
+        <div class="video-grid">
+          ${videos.map(video => `
+            <article class="video-card history-video-card" data-video-id="${video.id}">
+              <div class="video-thumbnail">
+                <img src="${video.thumbnail}" alt="${video.title}" loading="lazy">
+                <span class="video-duration">${video.duration}</span>
+                ${video.lastPosition ? `<div class="watch-progress-bar"><div class="watch-progress" style="width: ${(video.lastPosition / parseVideoDuration(video.duration)) * 100}%"></div></div>` : ''}
+                <button class="remove-history-btn" data-video-id="${video.id}" title="Remove from history">
+                  <i class="ph ph-x"></i>
+                </button>
+              </div>
+              <div class="video-details">
+                <div class="video-avatar">
+                  <img src="${video.channel?.avatar || ''}" alt="${video.channel?.name || ''}">
+                </div>
+                <div class="video-info">
+                  <h3 class="video-title">${video.title}</h3>
+                  <a href="#" class="video-channel" data-channel-id="${video.channel?.id || ''}">${video.channel?.name || 'Unknown'}</a>
+                  <div class="video-meta">
+                    <span>${utils.timeAgo(video.watchedAt)}</span>
+                    ${video.lastPosition ? `<span> • ${Math.floor(video.lastPosition / 60)}:${String(Math.floor(video.lastPosition % 60)).padStart(2, '0')} watched</span>` : ''}
+                  </div>
+                </div>
+              </div>
+            </article>
+          `).join('')}
+        </div>
+      </div>
+    `).join('');
+  }
+
+  // Render legacy grid
   grid.innerHTML = historyVideos.map(video => `
     <article class="video-card history-video-card" data-video-id="${video.id}">
       <div class="video-thumbnail">
@@ -3046,11 +3230,11 @@ function renderHistoryPage() {
       </div>
       <div class="video-details">
         <div class="video-avatar">
-          <img src="${video.channel.avatar}" alt="${video.channel.name}">
+          <img src="${video.channel?.avatar || ''}" alt="${video.channel?.name || ''}">
         </div>
         <div class="video-info">
           <h3 class="video-title">${video.title}</h3>
-          <a href="#" class="video-channel" data-channel-id="${video.channel.id}">${video.channel.name}</a>
+          <a href="#" class="video-channel" data-channel-id="${video.channel?.id || ''}">${video.channel?.name || 'Unknown'}</a>
           <div class="video-meta">
             <span>${utils.timeAgo(video.watchedAt)}</span>
             ${video.lastPosition ? `<span> • ${Math.floor(video.lastPosition / 60)}:${String(Math.floor(video.lastPosition % 60)).padStart(2, '0')} watched</span>` : ''}
@@ -3141,6 +3325,131 @@ function renderLikedPage() {
 
 // Render saved videos page
 function renderSavedPage() {
+  // Hide other pages
+  mainContent.style.display = 'none';
+  videoPlayerPage.style.display = 'none';
+  channelPage.style.display = 'none';
+  historyPage.style.display = 'none';
+  likedVideosPage.style.display = 'none';
+  subscriptionsPage.style.display = 'none';
+  trendingPage.style.display = 'none';
+  explorePage.style.display = 'none';
+  shortsPage.style.display = 'none';
+  gamingPage.style.display = 'none';
+  musicPage.style.display = 'none';
+  livePage.style.display = 'none';
+  playlistPage.style.display = 'none';
+
+  const user = auth.getCurrentUser();
+  const grid = document.getElementById('savedGrid');
+  const emptyState = document.getElementById('savedEmptyState');
+  const quickAccessSection = document.querySelector('.saved-quick-access');
+  const playlistsSection = document.querySelector('.saved-playlists-section');
+  const savedVideosSection = document.querySelector('.saved-videos-section');
+
+  // Update quick access counts
+  const watchLaterCount = document.getElementById('watchLaterCount');
+  const likedCount = document.getElementById('likedCount');
+  const historyCount = document.getElementById('historyCount');
+
+  if (user) {
+    if (watchLaterCount) watchLaterCount.textContent = `${user.watchLater?.length || 0} videos`;
+    if (likedCount) likedCount.textContent = `${user.likedVideos?.length || 0} videos`;
+    if (historyCount) historyCount.textContent = `${user.watchHistory?.length || 0} videos`;
+  } else {
+    if (watchLaterCount) watchLaterCount.textContent = '0 videos';
+    if (likedCount) likedCount.textContent = '0 videos';
+    if (historyCount) historyCount.textContent = '0 videos';
+  }
+
+  // Setup quick access click handlers
+  const quickAccessCards = document.querySelectorAll('.quick-access-card');
+  quickAccessCards.forEach(card => {
+    card.addEventListener('click', () => {
+      const type = card.dataset.quickAccess;
+      if (type === 'watch-later') {
+        renderWatchLater();
+      } else if (type === 'liked') {
+        renderLikedVideos();
+      } else if (type === 'history') {
+        renderHistoryPage();
+      }
+    });
+  });
+
+  // Setup tabs
+  const tabs = document.querySelectorAll('.saved-tab');
+  tabs.forEach(tab => {
+    tab.addEventListener('click', () => {
+      tabs.forEach(t => t.classList.remove('active'));
+      tab.classList.add('active');
+      const tabName = tab.dataset.savedTab;
+
+      // Show/hide sections based on tab
+      if (quickAccessSection) quickAccessSection.style.display = tabName === 'history' ? 'block' : 'none';
+      if (playlistsSection) playlistsSection.style.display = tabName === 'playlists' ? 'block' : 'none';
+
+      // Render content based on tab
+      if (tabName === 'history') {
+        renderHistoryContent();
+      } else if (tabName === 'watch-later') {
+        renderWatchLaterContent();
+      } else if (tabName === 'liked') {
+        renderLikedContent();
+      } else if (tabName === 'playlists') {
+        renderPlaylistsContent();
+      } else if (tabName === 'your-videos') {
+        renderYourVideosContent();
+      }
+    });
+  });
+
+  // Render playlists
+  const playlistsGrid = document.getElementById('playlistsGrid');
+  if (playlistsGrid && user && user.playlists) {
+    if (user.playlists.length === 0) {
+      playlistsGrid.innerHTML = '<p class="empty-text">No playlists yet. Create one!</p>';
+    } else {
+      playlistsGrid.innerHTML = user.playlists.map(playlist => `
+        <div class="playlist-card" data-playlist-id="${playlist.id}">
+          <div class="playlist-thumbnail">
+            ${playlist.videos.length > 0 ? `<img src="${videos.find(v => v.id === playlist.videos[0])?.thumbnail || ''}" alt="Playlist">` : '<div class="playlist-empty-thumb"><i class="ph-fill ph-playlist"></i></div>'}
+            <span class="playlist-count">${playlist.videos.length}</span>
+          </div>
+          <h3>${playlist.name}</h3>
+          <p>${playlist.videos.length} videos</p>
+        </div>
+      `).join('');
+
+      playlistsGrid.querySelectorAll('.playlist-card').forEach(card => {
+        card.addEventListener('click', () => {
+          openPlaylistPage(card.dataset.playlistId);
+        });
+      });
+    }
+  }
+
+  // Setup create playlist button
+  const createPlaylistBtn = document.getElementById('createPlaylistBtn');
+  if (createPlaylistBtn) {
+    createPlaylistBtn.addEventListener('click', () => {
+      const name = prompt('Enter playlist name:');
+      if (name && user) {
+        auth.createPlaylist(name);
+        utils.showToast('Playlist created!');
+        renderSavedPage();
+      }
+    });
+  }
+
+  // Default: render all saved videos
+  renderAllSavedVideos();
+
+  savedVideosPage.style.display = 'block';
+}
+
+// Render all saved videos
+function renderAllSavedVideos() {
   const user = auth.getCurrentUser();
   const grid = document.getElementById('savedGrid');
   const emptyState = document.getElementById('savedEmptyState');
@@ -3148,7 +3457,6 @@ function renderSavedPage() {
   if (!user || !user.savedVideos || user.savedVideos.length === 0) {
     grid.innerHTML = '';
     emptyState.style.display = 'flex';
-    savedVideosPage.style.display = 'block';
     return;
   }
 
@@ -3157,22 +3465,184 @@ function renderSavedPage() {
   if (savedVideosList.length === 0) {
     grid.innerHTML = '';
     emptyState.style.display = 'flex';
-    savedVideosPage.style.display = 'block';
     return;
   }
 
   emptyState.style.display = 'none';
   grid.innerHTML = savedVideosList.map(renderVideoCard).join('');
 
-  // Add click handlers
   grid.querySelectorAll('.video-card').forEach(card => {
     card.addEventListener('click', () => {
-      const videoId = card.dataset.videoId;
-      openVideoPlayer(videoId);
+      openVideoPlayer(card.dataset.videoId);
     });
   });
+}
+
+// Render watch later content
+function renderWatchLaterContent() {
+  const user = auth.getCurrentUser();
+  const grid = document.getElementById('savedGrid');
+  const emptyState = document.getElementById('savedEmptyState');
+
+  if (!user || !user.watchLater || user.watchLater.length === 0) {
+    grid.innerHTML = '';
+    emptyState.innerHTML = '<i class="ph-fill ph-clock"></i><h3>No videos in Watch Later</h3><p>Add videos to watch later</p>';
+    emptyState.style.display = 'flex';
+    return;
+  }
+
+  const watchLaterVideos = user.watchLater.map(s => videos.find(v => v.id === s.videoId)).filter(Boolean);
+  emptyState.style.display = 'none';
+  grid.innerHTML = watchLaterVideos.map(renderVideoCard).join('');
+
+  grid.querySelectorAll('.video-card').forEach(card => {
+    card.addEventListener('click', () => {
+      openVideoPlayer(card.dataset.videoId);
+    });
+  });
+}
+
+// Render liked content
+function renderLikedContent() {
+  const user = auth.getCurrentUser();
+  const grid = document.getElementById('savedGrid');
+  const emptyState = document.getElementById('savedEmptyState');
+
+  if (!user || !user.likedVideos || user.likedVideos.length === 0) {
+    grid.innerHTML = '';
+    emptyState.innerHTML = '<i class="ph-fill ph-heart"></i><h3>No liked videos</h3><p>Videos you like will appear here</p>';
+    emptyState.style.display = 'flex';
+    return;
+  }
+
+  const likedVideos = user.likedVideos.map(s => videos.find(v => v.id === s.videoId)).filter(Boolean);
+  emptyState.style.display = 'none';
+  grid.innerHTML = likedVideos.map(renderVideoCard).join('');
+
+  grid.querySelectorAll('.video-card').forEach(card => {
+    card.addEventListener('click', () => {
+      openVideoPlayer(card.dataset.videoId);
+    });
+  });
+}
+
+// Render playlists content
+function renderPlaylistsContent() {
+  const user = auth.getCurrentUser();
+  const grid = document.getElementById('savedGrid');
+  const emptyState = document.getElementById('savedEmptyState');
+
+  if (!user || !user.playlists || user.playlists.length === 0) {
+    grid.innerHTML = '';
+    emptyState.innerHTML = '<i class="ph-fill ph-list"></i><h3>No playlists</h3><p>Create a playlist to organize your videos</p>';
+    emptyState.style.display = 'flex';
+    return;
+  }
+
+  emptyState.style.display = 'none';
+  grid.innerHTML = user.playlists.map(playlist => `
+    <div class="playlist-card-large" data-playlist-id="${playlist.id}">
+      <div class="playlist-thumbnail">
+        ${playlist.videos.length > 0 ? `<img src="${videos.find(v => v.id === playlist.videos[0])?.thumbnail || ''}" alt="Playlist">` : '<div class="playlist-empty-thumb"><i class="ph-fill ph-playlist"></i></div>'}
+        <span class="playlist-count">${playlist.videos.length}</span>
+      </div>
+      <div class="playlist-info">
+        <h3>${playlist.name}</h3>
+        <p>${playlist.videos.length} videos</p>
+        <button class="btn-primary btn-sm"><i class="ph ph-play"></i> Play All</button>
+      </div>
+    </div>
+  `).join('');
+
+  grid.querySelectorAll('.playlist-card-large').forEach(card => {
+    card.addEventListener('click', () => {
+      openPlaylistPage(card.dataset.playlistId);
+    });
+  });
+}
+
+// Render your videos content
+function renderYourVideosContent() {
+  const user = auth.getCurrentUser();
+  const grid = document.getElementById('savedGrid');
+  const emptyState = document.getElementById('savedEmptyState');
+
+  // For demo, show uploaded videos or empty state
+  const uploadedVideos = user?.uploadedVideos || [];
+
+  if (uploadedVideos.length === 0) {
+    grid.innerHTML = '';
+    emptyState.innerHTML = '<i class="ph-fill ph-video-camera"></i><h3>No uploaded videos</h3><p>Upload videos to see them here</p><button class="btn-primary" onclick="handleNavigation(\'studio\')">Go to Studio</button>';
+    emptyState.style.display = 'flex';
+    return;
+  }
+
+  emptyState.style.display = 'none';
+  const yourVideos = uploadedVideos.map(id => videos.find(v => v.id === id)).filter(Boolean);
+  grid.innerHTML = yourVideos.map(renderVideoCard).join('');
+
+  grid.querySelectorAll('.video-card').forEach(card => {
+    card.addEventListener('click', () => {
+      openVideoPlayer(card.dataset.videoId);
+    });
+  });
+}
+
+// Render history content (called from tabs)
+function renderHistoryContent() {
+  renderHistoryPage();
+}
+
+// Render Watch Later page
+function renderWatchLater() {
+  mainContent.style.display = 'none';
+  videoPlayerPage.style.display = 'none';
+  channelPage.style.display = 'none';
+  historyPage.style.display = 'none';
+  subscriptionsPage.style.display = 'none';
+  trendingPage.style.display = 'none';
+  explorePage.style.display = 'none';
+  shortsPage.style.display = 'none';
+  gamingPage.style.display = 'none';
+  musicPage.style.display = 'none';
+  livePage.style.display = 'none';
+  playlistPage.style.display = 'none';
 
   savedVideosPage.style.display = 'block';
+
+  // Click on watch later tab
+  const watchLaterTab = document.querySelector('.saved-tab[data-saved-tab="watch-later"]');
+  if (watchLaterTab) {
+    watchLaterTab.click();
+  } else {
+    renderWatchLaterContent();
+  }
+}
+
+// Render Liked Videos page
+function renderLikedVideos() {
+  mainContent.style.display = 'none';
+  videoPlayerPage.style.display = 'none';
+  channelPage.style.display = 'none';
+  historyPage.style.display = 'none';
+  subscriptionsPage.style.display = 'none';
+  trendingPage.style.display = 'none';
+  explorePage.style.display = 'none';
+  shortsPage.style.display = 'none';
+  gamingPage.style.display = 'none';
+  musicPage.style.display = 'none';
+  livePage.style.display = 'none';
+  playlistPage.style.display = 'none';
+
+  savedVideosPage.style.display = 'block';
+
+  // Click on liked tab
+  const likedTab = document.querySelector('.saved-tab[data-saved-tab="liked"]');
+  if (likedTab) {
+    likedTab.click();
+  } else {
+    renderLikedContent();
+  }
 }
 
 // Open playlist page

@@ -1143,9 +1143,47 @@
     <!-- Watch History Page -->
     <div class="history-page" id="historyPage" style="display: none;">
       <div class="history-header">
-        <h1>Watch History</h1>
-        <button class="btn-secondary" id="clearHistoryBtn">Clear all history</button>
+        <h1><i class="ph-fill ph-clock-counter-clockwise"></i> Watch History</h1>
+        <div class="history-tabs">
+          <button class="history-tab active" data-history-tab="videos">Videos</button>
+          <button class="history-tab" data-history-tab="channels">Channels</button>
+          <button class="history-tab" data-history-tab="searches">Search History</button>
+        </div>
+        <div class="history-actions">
+          <button class="btn-secondary" id="pauseHistoryBtn"><i class="ph ph-pause"></i> Pause History</button>
+          <button class="btn-secondary" id="clearHistoryBtn"><i class="ph ph-trash"></i> Clear all history</button>
+        </div>
       </div>
+
+      <!-- Watch Time Stats -->
+      <section class="history-stats">
+        <div class="history-stat-card">
+          <i class="ph-fill ph-clock"></i>
+          <div class="stat-info">
+            <span class="stat-value" id="totalWatchTime">0 hours</span>
+            <span class="stat-label">Total watch time</span>
+          </div>
+        </div>
+        <div class="history-stat-card">
+          <i class="ph-fill ph-video-camera"></i>
+          <div class="stat-info">
+            <span class="stat-value" id="videosWatched">0</span>
+            <span class="stat-label">Videos watched</span>
+          </div>
+        </div>
+        <div class="history-stat-card">
+          <i class="ph-fill ph-calendar"></i>
+          <div class="stat-info">
+            <span class="stat-value" id="daysActive">0</span>
+            <span class="stat-label">Days active</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- Date Groups -->
+      <div class="history-date-groups" id="historyDateGroups">
+      </div>
+
       <div class="video-grid" id="historyGrid">
         <!-- History videos will be loaded here -->
       </div>
@@ -1153,6 +1191,7 @@
         <i class="ph-fill ph-clock-counter-clockwise"></i>
         <h3>No watch history</h3>
         <p>Videos you watch will appear here</p>
+        <button class="btn-primary" onclick="handleNavigation('home')">Start Watching</button>
       </div>
     </div>
 
@@ -1174,18 +1213,60 @@
     <!-- Saved Videos Page -->
     <div class="saved-videos-page" id="savedVideosPage" style="display: none;">
       <div class="saved-header">
-        <h1>Saved Videos</h1>
-        <button class="tab-btn active" data-tab="all">All</button>
-        <button class="tab-btn" data-tab="watch-later">Watch Later</button>
-        <button class="tab-btn" data-tab="playlists">Playlists</button>
+        <h1><i class="ph-fill ph-bookmark-simple"></i> Library</h1>
+        <div class="saved-tabs">
+          <button class="saved-tab active" data-saved-tab="history">History</button>
+          <button class="saved-tab" data-saved-tab="watch-later">Watch Later</button>
+          <button class="saved-tab" data-saved-tab="liked">Liked Videos</button>
+          <button class="saved-tab" data-saved-tab="playlists">Playlists</button>
+          <button class="saved-tab" data-saved-tab="your-videos">Your Videos</button>
+        </div>
       </div>
-      <div class="video-grid" id="savedGrid">
-        <!-- Saved videos will be loaded here -->
-      </div>
+
+      <!-- Quick Access Section -->
+      <section class="saved-quick-access">
+        <h2><i class="ph-fill ph-lightning"></i> Quick Access</h2>
+        <div class="quick-access-grid">
+          <div class="quick-access-card" data-quick-access="watch-later">
+            <i class="ph-fill ph-clock"></i>
+            <span>Watch Later</span>
+            <span class="count" id="watchLaterCount">0 videos</span>
+          </div>
+          <div class="quick-access-card" data-quick-access="liked">
+            <i class="ph-fill ph-heart"></i>
+            <span>Liked Videos</span>
+            <span class="count" id="likedCount">0 videos</span>
+          </div>
+          <div class="quick-access-card" data-quick-access="history">
+            <i class="ph-fill ph-clock-counter-clockwise"></i>
+            <span>Watch History</span>
+            <span class="count" id="historyCount">0 videos</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- Playlists Section -->
+      <section class="saved-playlists-section">
+        <div class="section-header">
+          <h2><i class="ph-fill ph-list"></i> Your Playlists</h2>
+          <button class="btn-primary btn-sm" id="createPlaylistBtn"><i class="ph ph-plus"></i> New Playlist</button>
+        </div>
+        <div class="playlists-grid" id="playlistsGrid">
+        </div>
+      </section>
+
+      <!-- All Saved Videos -->
+      <section class="saved-videos-section">
+        <h2><i class="ph-fill ph-video-camera"></i> All Saved Videos</h2>
+        <div class="video-grid" id="savedGrid">
+        </div>
+      </section>
+
       <div class="empty-state" id="savedEmptyState" style="display: none;">
         <i class="ph-fill ph-bookmark-simple"></i>
-        <h3>No saved videos</h3>
+        <h3>Your library is empty</h3>
         <p>Save videos to watch later</p>
+        <button class="btn-primary" onclick="handleNavigation('home')">Browse Videos</button>
       </div>
     </div>
 
@@ -1350,15 +1431,42 @@
 
     <div class="subscriptions-page" id="subscriptionsPage" style="display: none;">
       <div class="subscriptions-header">
-        <h1>Subscriptions</h1>
+        <h1><i class="ph-fill ph-users"></i> Subscriptions</h1>
+        <div class="subscriptions-tabs">
+          <button class="subscriptions-tab active" data-subscriptions-tab="for-you">For You</button>
+          <button class="subscriptions-tab" data-subscriptions-tab="today">Today</button>
+          <button class="subscriptions-tab" data-subscriptions-tab="this-week">This Week</button>
+          <button class="subscriptions-tab" data-subscriptions-tab="channels">Channels</button>
+        </div>
+        <button class="btn-secondary" id="manageSubscriptionsBtn"><i class="ph ph-gear"></i> Manage</button>
       </div>
-      <div class="subscriptions-grid" id="subscriptionsGrid">
-        <!-- Subscribed channels will be loaded here -->
-      </div>
+
+      <!-- For You Section -->
+      <section class="subscriptions-feed" id="subscriptionsFeed">
+        <h2><i class="ph-fill ph-play"></i> Latest from subscriptions</h2>
+        <div class="video-grid" id="subscriptionsFeedGrid">
+        </div>
+      </section>
+
+      <!-- Channels Section -->
+      <section class="subscriptions-channels-section" id="subscriptionsChannelsSection" style="display: none;">
+        <h2><i class="ph-fill ph-users"></i> Your Channels</h2>
+        <div class="subscriptions-grid" id="subscriptionsGrid">
+        </div>
+      </section>
+
+      <!-- Notifications Section -->
+      <section class="subscriptions-notifications-section">
+        <h2><i class="ph-fill ph-bell"></i> Recent Activity</h2>
+        <div class="notifications-list" id="subscriptionsNotifications">
+        </div>
+      </section>
+
       <div class="empty-state" id="subscriptionsEmptyState" style="display: none;">
         <i class="ph-fill ph-users"></i>
         <h3>No subscriptions</h3>
         <p>Subscribe to channels to see their latest videos</p>
+        <button class="btn-primary" onclick="handleNavigation('explore')">Explore Channels</button>
       </div>
     </div>
 
