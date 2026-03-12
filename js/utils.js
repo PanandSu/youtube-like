@@ -2,6 +2,7 @@
 
 // Format number with K, M, B suffixes
 function formatNumber(num) {
+  if (num === undefined || num === null) return '0';
   if (num >= 1000000000) {
     return (num / 1000000000).toFixed(1).replace(/\.0$/, '') + 'B';
   }
@@ -16,6 +17,7 @@ function formatNumber(num) {
 
 // Format time ago
 function timeAgo(date) {
+  if (!date) return 'Unknown';
   const now = new Date();
   const diff = now - date;
   const seconds = Math.floor(diff / 1000);
@@ -42,6 +44,7 @@ function formatSubscribers(num) {
 
 // Format time for video player
 function formatTime(seconds) {
+  if (seconds === undefined || seconds === null || isNaN(seconds)) return '0:00';
   const mins = Math.floor(seconds / 60);
   const secs = Math.floor(seconds % 60);
   return `${mins}:${secs.toString().padStart(2, '0')}`;
