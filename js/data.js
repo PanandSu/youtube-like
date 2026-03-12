@@ -338,6 +338,135 @@ const mockVideos = [
     likes: 156000,
     liked: false,
     subscribed: false
+  },
+  // Shorts - videos under 3 minutes
+  {
+    id: 'v17',
+    title: 'Quick Coding Tip #1',
+    thumbnail: 'https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=640&h=360&fit=crop',
+    duration: '2:45',
+    views: 450000,
+    uploadedAt: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000),
+    channel: {
+      id: 'c1',
+      name: 'CodeMaster Pro',
+      avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop',
+      subscribers: 2500000,
+      verified: true
+    },
+    description: 'Quick tip for better code!',
+    tags: ['coding', 'tips', 'short'],
+    category: 'tech',
+    videoUrl: 'https://storage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4',
+    likes: 12000,
+    liked: false,
+    subscribed: false
+  },
+  {
+    id: 'v18',
+    title: 'Epic Gaming Clip',
+    thumbnail: 'https://images.unsplash.com/photo-1542751371-adc38448a05e?w=640&h=360&fit=crop',
+    duration: '0:58',
+    views: 890000,
+    uploadedAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000),
+    channel: {
+      id: 'c2',
+      name: 'Gaming Insider',
+      avatar: 'https://images.unsplash.com/photo-1522075469751-3a3694fb2c61?w=100&h=100&fit=crop',
+      subscribers: 5200000,
+      verified: true
+    },
+    description: 'Insane gaming moment!',
+    tags: ['gaming', 'clips', 'highlights'],
+    category: 'gaming',
+    videoUrl: 'https://storage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4',
+    likes: 25000,
+    liked: false,
+    subscribed: false
+  },
+  {
+    id: 'v19',
+    title: 'Funny Cat Compilation',
+    thumbnail: 'https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?w=640&h=360&fit=crop',
+    duration: '1:30',
+    views: 2100000,
+    uploadedAt: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000),
+    channel: {
+      id: 'c17',
+      name: 'Pet Paradise',
+      avatar: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100&h=100&fit=crop',
+      subscribers: 1500000
+    },
+    description: 'Cats doing funny things!',
+    tags: ['pets', 'cats', 'funny'],
+    category: 'comedy',
+    videoUrl: 'https://storage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4',
+    likes: 67000,
+    liked: false,
+    subscribed: false
+  },
+  {
+    id: 'v20',
+    title: '5-Second Recipe',
+    thumbnail: 'https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=640&h=360&fit=crop',
+    duration: '0:45',
+    views: 560000,
+    uploadedAt: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000),
+    channel: {
+      id: 'c6',
+      name: "Chef's Kitchen",
+      avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop',
+      subscribers: 2100000
+    },
+    description: 'Quick and easy recipe!',
+    tags: ['cooking', 'food', 'quick'],
+    category: 'cooking',
+    videoUrl: 'https://storage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4',
+    likes: 18000,
+    liked: false,
+    subscribed: false
+  },
+  {
+    id: 'v21',
+    title: 'Dance Challenge',
+    thumbnail: 'https://images.unsplash.com/photo-1518834107812-67b0b7c58434?w=640&h=360&fit=crop',
+    duration: '2:15',
+    views: 1800000,
+    uploadedAt: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000),
+    channel: {
+      id: 'c18',
+      name: 'Dance Studio',
+      avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&h=100&fit=crop',
+      subscribers: 2800000
+    },
+    description: 'Join the dance challenge!',
+    tags: ['dance', 'music', 'challenge'],
+    category: 'music',
+    videoUrl: 'https://storage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4',
+    likes: 45000,
+    liked: false,
+    subscribed: false
+  },
+  {
+    id: 'v22',
+    title: 'Fitness Quick Workout',
+    thumbnail: 'https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?w=640&h=360&fit=crop',
+    duration: '3:00',
+    views: 780000,
+    uploadedAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000),
+    channel: {
+      id: 'c19',
+      name: 'FitLife',
+      avatar: 'https://images.unsplash.com/photo-1580489944761-15a19d654956?w=100&h=100&fit=crop',
+      subscribers: 1900000
+    },
+    description: 'Quick workout routine!',
+    tags: ['fitness', 'workout', 'health'],
+    category: 'sports',
+    videoUrl: 'https://storage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4',
+    likes: 22000,
+    liked: false,
+    subscribed: false
   }
 ];
 
