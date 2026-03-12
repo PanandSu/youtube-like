@@ -42,13 +42,13 @@ function renderVideoCard(video) {
       </div>
       <div class="video-details">
         <div class="video-avatar">
-          <img src="${video.channel.avatar}" alt="${safeChannelName}">
+          <img src="${video.channel?.avatar || ''}" alt="${safeChannelName}">
         </div>
         <div class="video-info">
           <h3 class="video-title">${safeTitle}</h3>
           <a href="#" class="video-channel" data-channel-id="${safeChannelId}">
             ${safeChannelName}
-            ${video.channel.verified ? '<span class="channel-verified"><i class="ph-fill ph-check"></i></span>' : ''}
+            ${video.channel?.verified ? '<span class="channel-verified"><i class="ph-fill ph-check"></i></span>' : ''}
           </a>
           <div class="video-meta">
             <span>${utils.formatNumber(video.views)} views</span>
