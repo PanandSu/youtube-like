@@ -120,6 +120,18 @@
           <i class="ph-fill ph-play-circle"></i>
           <span>Shorts</span>
         </a>
+        <a href="#" class="nav-item" data-route="gaming">
+          <i class="ph-fill ph-game-controller"></i>
+          <span>Gaming</span>
+        </a>
+        <a href="#" class="nav-item" data-route="music">
+          <i class="ph-fill ph-music-notes"></i>
+          <span>Music</span>
+        </a>
+        <a href="#" class="nav-item" data-route="live">
+          <i class="ph-fill ph-broadcast"></i>
+          <span>Live</span>
+        </a>
         <a href="#" class="nav-item" data-route="subscriptions">
           <i class="ph-fill ph-youtube-logo"></i>
           <span>Subscriptions</span>
@@ -1431,6 +1443,90 @@
       <div class="shorts-grid" id="shortsGrid">
         <!-- Shorts will be loaded here -->
       </div>
+    </div>
+
+    <!-- Gaming Page -->
+    <div class="gaming-page" id="gamingPage" style="display: none;">
+      <div class="gaming-header">
+        <h1><i class="ph-fill ph-game-controller"></i> Gaming</h1>
+        <p>Live streams, gameplay videos, and esports</p>
+      </div>
+      <div class="gaming-categories" id="gamingCategories">
+        <button class="gaming-category active" data-gaming-category="all">All</button>
+        <button class="gaming-category" data-gaming-category="live">Live</button>
+        <button class="gaming-category" data-gaming-category="gameplay">Gameplay</button>
+        <button class="gaming-category" data-gaming-category="esports">Esports</button>
+        <button class="gaming-category" data-gaming-category="walkthrough">Walkthroughs</button>
+        <button class="gaming-category" data-gaming-category="reviews">Reviews</button>
+      </div>
+      <div class="gaming-streams" id="gamingStreams">
+        <!-- Live streams will be loaded here -->
+      </div>
+      <section class="gaming-videos-section">
+        <h2><i class="ph-fill ph-video-camera"></i> Gaming Videos</h2>
+        <div class="video-grid" id="gamingGrid">
+          <!-- Gaming videos will be loaded here -->
+        </div>
+      </section>
+    </div>
+
+    <!-- Music Page -->
+    <div class="music-page" id="musicPage" style="display: none;">
+      <div class="music-header">
+        <h1><i class="ph-fill ph-music-notes"></i> Music</h1>
+        <p>Music videos, live performances, and playlists</p>
+      </div>
+      <div class="music-mood-grid" id="musicMoodGrid">
+        <button class="mood-card" data-mood="chill"><i class="ph-fill ph-wind"></i><span>Chill</span></button>
+        <button class="mood-card" data-mood="energetic"><i class="ph-fill ph-lightning"></i><span>Energetic</span></button>
+        <button class="mood-card" data-mood="happy"><i class="ph-fill ph-smile"></i><span>Happy</span></button>
+        <button class="mood-card" data-mood="sad"><i class="ph-fill ph-heart-break"></i><span>Sad</span></button>
+        <button class="mood-card" data-mood="focus"><i class="ph-fill ph-brain"></i><span>Focus</span></button>
+        <button class="mood-card" data-mood="party"><i class="ph-fill ph-confetti"></i><span>Party</span></button>
+      </div>
+      <section class="music-featured-section">
+        <h2><i class="ph-fill ph-star"></i> Featured Artists</h2>
+        <div class="artists-grid" id="musicArtistsGrid">
+          <!-- Artists will be loaded here -->
+        </div>
+      </section>
+      <section class="music-videos-section">
+        <h2><i class="ph-fill ph-video-camera"></i> Music Videos</h2>
+        <div class="video-grid" id="musicGrid">
+          <!-- Music videos will be loaded here -->
+        </div>
+      </section>
+    </div>
+
+    <!-- Live Page -->
+    <div class="live-page" id="livePage" style="display: none;">
+      <div class="live-header">
+        <h1><i class="ph-fill ph-broadcast"></i> Live</h1>
+        <p>Watch live streams now</p>
+      </div>
+      <section class="live-now-section">
+        <h2><i class="ph-fill ph-broadcast"></i> Live Now</h2>
+        <div class="live-grid" id="liveNowGrid">
+          <!-- Live streams will be loaded here -->
+        </div>
+      </section>
+      <section class="live-upcoming-section">
+        <h2><i class="ph-fill ph-calendar"></i> Upcoming</h2>
+        <div class="live-grid" id="liveUpcomingGrid">
+          <!-- Upcoming streams -->
+        </div>
+      </section>
+      <section class="live-categories-section">
+        <h2><i class="ph-fill ph-grid-nine"></i> Browse by Category</h2>
+        <div class="live-categories-grid" id="liveCategoriesGrid">
+          <button class="live-category-card" data-live-category="gaming"><i class="ph-fill ph-game-controller"></i><span>Gaming</span></button>
+          <button class="live-category-card" data-live-category="music"><i class="ph-fill ph-music-notes"></i><span>Music</span></button>
+          <button class="live-category-card" data-live-category="sports"><i class="ph-fill ph-trophy"></i><span>Sports</span></button>
+          <button class="live-category-card" data-live-category="news"><i class="ph-fill ph-newspaper"></i><span>News</span></button>
+          <button class="live-category-card" data-live-category="cooking"><i class="ph-fill ph-cooking-pot"></i><span>Cooking</span></button>
+          <button class="live-category-card" data-live-category="tech"><i class="ph-fill ph-laptop"></i><span>Tech</span></button>
+        </div>
+      </section>
     </div>
 
     <!-- Settings Page -->

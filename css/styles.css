@@ -5575,3 +5575,320 @@ body.theater-mode .recommendations {
     white-space: nowrap;
   }
 }
+
+/* Gaming Page */
+.gaming-page {
+  padding: 24px;
+  max-width: 1800px;
+  margin: 0 auto;
+}
+
+.gaming-header {
+  margin-bottom: 24px;
+}
+
+.gaming-header h1 {
+  font-size: 28px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+.gaming-header h1 i {
+  color: #ff0000;
+}
+
+.gaming-header p {
+  color: var(--text-secondary);
+  font-size: 14px;
+}
+
+.gaming-categories {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+}
+
+.gaming-category {
+  padding: 8px 16px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 20px;
+  color: var(--text-primary);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 14px;
+}
+
+.gaming-category:hover {
+  background: var(--bg-tertiary);
+}
+
+.gaming-category.active {
+  background: var(--accent-primary);
+  color: var(--bg-primary);
+  border-color: var(--accent-primary);
+}
+
+.gaming-streams {
+  margin-bottom: 32px;
+}
+
+.gaming-videos-section h2 {
+  font-size: 20px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+/* Music Page */
+.music-page {
+  padding: 24px;
+  max-width: 1800px;
+  margin: 0 auto;
+}
+
+.music-header {
+  margin-bottom: 24px;
+}
+
+.music-header h1 {
+  font-size: 28px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+.music-header h1 i {
+  color: #ff0000;
+}
+
+.music-header p {
+  color: var(--text-secondary);
+  font-size: 14px;
+}
+
+.music-mood-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  gap: 16px;
+  margin-bottom: 32px;
+}
+
+.mood-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 20px 16px;
+  background: linear-gradient(135deg, var(--bg-secondary), var(--bg-tertiary));
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  color: var(--text-primary);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.mood-card:hover {
+  transform: translateY(-2px);
+  border-color: var(--accent-primary);
+}
+
+.mood-card i {
+  font-size: 32px;
+}
+
+.mood-card[data-mood="chill"] i { color: #64b5f6; }
+.mood-card[data-mood="energetic"] i { color: #ffeb3b; }
+.mood-card[data-mood="happy"] i { color: #4caf50; }
+.mood-card[data-mood="sad"] i { color: #9c27b0; }
+.mood-card[data-mood="focus"] i { color: #00bcd4; }
+.mood-card[data-mood="party"] i { color: #ff9800; }
+
+.mood-card span {
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.music-featured-section,
+.music-videos-section {
+  margin-bottom: 32px;
+}
+
+.music-featured-section h2,
+.music-videos-section h2 {
+  font-size: 20px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.artists-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 16px;
+}
+
+.artist-card {
+  text-align: center;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+.artist-card:hover {
+  transform: scale(1.05);
+}
+
+.artist-card img {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-bottom: 12px;
+  border: 3px solid var(--border-color);
+}
+
+.artist-card h3 {
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.artist-card p {
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+/* Live Page */
+.live-page {
+  padding: 24px;
+  max-width: 1800px;
+  margin: 0 auto;
+}
+
+.live-header {
+  margin-bottom: 24px;
+}
+
+.live-header h1 {
+  font-size: 28px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+.live-header h1 i {
+  color: #ff0000;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+.live-header p {
+  color: var(--text-secondary);
+  font-size: 14px;
+}
+
+.live-now-section,
+.live-upcoming-section,
+.live-categories-section {
+  margin-bottom: 32px;
+}
+
+.live-now-section h2,
+.live-upcoming-section h2,
+.live-categories-section h2 {
+  font-size: 20px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.live-now-section h2 i {
+  color: #ff0000;
+  animation: pulse 2s infinite;
+}
+
+.live-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 20px;
+}
+
+.live-categories-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 16px;
+}
+
+.live-category-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 20px 16px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  color: var(--text-primary);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.live-category-card:hover {
+  transform: translateY(-2px);
+  border-color: var(--accent-primary);
+}
+
+.live-category-card i {
+  font-size: 28px;
+}
+
+.live-category-card span {
+  font-size: 14px;
+  font-weight: 500;
+}
+
+/* Responsive adjustments for new pages */
+@media (max-width: 768px) {
+  .gaming-page,
+  .music-page,
+  .live-page {
+    padding: 16px;
+  }
+
+  .gaming-categories,
+  .music-mood-grid,
+  .live-categories-grid {
+    overflow-x: auto;
+    flex-wrap: nowrap;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: 8px;
+  }
+
+  .gaming-category,
+  .mood-card,
+  .live-category-card {
+    flex-shrink: 0;
+  }
+
+  .live-grid {
+    grid-template-columns: 1fr;
+  }
+}

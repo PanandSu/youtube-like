@@ -69,6 +69,9 @@ const savedVideosPage = document.getElementById('savedVideosPage');
 const subscriptionsPage = document.getElementById('subscriptionsPage');
 const trendingPage = document.getElementById('trendingPage');
 const shortsPage = document.getElementById('shortsPage');
+const gamingPage = document.getElementById('gamingPage');
+const musicPage = document.getElementById('musicPage');
+const livePage = document.getElementById('livePage');
 const explorePage = document.getElementById('explorePage');
 const settingsPage = document.getElementById('settingsPage');
 const studioPage = document.getElementById('studioPage');
@@ -1922,6 +1925,9 @@ function handleNavigation(route) {
   subscriptionsPage.style.display = 'none';
   trendingPage.style.display = 'none';
   shortsPage.style.display = 'none';
+  gamingPage.style.display = 'none';
+  musicPage.style.display = 'none';
+  livePage.style.display = 'none';
   explorePage.style.display = 'none';
   settingsPage.style.display = 'none';
   studioPage.style.display = 'none';
@@ -1940,6 +1946,15 @@ function handleNavigation(route) {
       break;
     case 'shorts':
       renderShortsPage();
+      break;
+    case 'gaming':
+      renderGamingPage();
+      break;
+    case 'music':
+      renderMusicPage();
+      break;
+    case 'live':
+      renderLivePage();
       break;
     case 'settings':
       renderSettingsPage();
@@ -2317,6 +2332,202 @@ function renderShortsPage() {
   });
 
   container.style.display = 'block';
+}
+
+// Render Gaming Page
+function renderGamingPage() {
+  const grid = document.getElementById('gamingGrid');
+  const streamsContainer = document.getElementById('gamingStreams');
+
+  // Filter gaming videos
+  const gamingVideos = videos.filter(v => v.category === 'gaming' || v.tags?.includes('gaming'));
+
+  // If no gaming-specific videos, use some from the general pool
+  const displayVideos = gamingVideos.length > 0 ? gamingVideos : videos.slice(0, 12);
+
+  // Render gaming videos
+  if (grid) {
+    grid.innerHTML = displayVideos.map(renderVideoCard).join('');
+
+    // Add click handlers
+    grid.querySelectorAll('.video-card').forEach(card => {
+      card.addEventListener('click', (e) => {
+        if (!e.target.closest('.video-menu')) {
+          const videoId = card.dataset.videoId;
+          openVideoPlayer(videoId);
+        }
+      });
+    });
+  }
+
+  // Setup gaming category buttons
+  const categoryBtns = document.querySelectorAll('.gaming-category');
+  categoryBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      categoryBtns.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+
+      const category = btn.dataset.gamingCategory;
+      let filtered = videos;
+
+      if (category === 'live') {
+        filtered = videos.filter(v => v.live);
+      } else if (category === 'all') {
+        filtered = videos;
+      } else {
+        filtered = videos.filter(v =>
+          v.category === 'gaming' ||
+          v.tags?.some(t => t.toLowerCase().includes(category))
+        );
+      }
+
+      if (grid) {
+        grid.innerHTML = filtered.slice(0, 12).map(renderVideoCard).join('');
+        grid.querySelectorAll('.video-card').forEach(card => {
+          card.addEventListener('click', () => {
+            openVideoPlayer(card.dataset.videoId);
+          });
+        });
+      }
+    });
+  });
+
+  gamingPage.style.display = 'block';
+}
+
+// Render Music Page
+function renderMusicPage() {
+  const grid = document.getElementById('musicGrid');
+  const artistsGrid = document.getElementById('musicArtistsGrid');
+  const moodGrid = document.getElementById('musicMoodGrid');
+
+  // Filter music videos
+  const musicVideos = videos.filter(v => v.category === 'music' || v.tags?.includes('music'));
+
+  // If no music-specific videos, use some from the general pool
+  const displayVideos = musicVideos.length > 0 ? musicVideos : videos.slice(0, 12);
+
+  // Render music videos
+  if (grid) {
+    grid.innerHTML = displayVideos.map(renderVideoCard).join('');
+
+    grid.querySelectorAll('.video-card').forEach(card => {
+      card.addEventListener('click', (e) => {
+        if (!e.target.closest('.video-menu')) {
+          const videoId = card.dataset.videoId;
+          openVideoPlayer(videoId);
+        }
+      });
+    });
+  }
+
+  // Render featured artists (mock data)
+  const artists = [
+    { name: 'Taylor Swift', avatar: 'https://picsum.photos/seed/artist1/200', subscribers: '170M' },
+    { name: 'Ed Sheeran', avatar: 'https://picsum.photos/seed/artist2/200', subscribers: '50M' },
+    { name: 'BTS', avatar: 'https://picsum.photos/seed/artist3/200', subscribers: '72M' },
+    { name: 'Ariana Grande', avatar: 'https://picsum.photos/seed/artist4/200', subscribers: '52M' },
+    { name: 'Drake', avatar: 'https://picsum.photos/seed/artist5/200', subscribers: '45M' },
+    { name: 'Billie Eilish', avatar: 'https://picsum.photos/seed/artist6/200', subscribers: '38M' }
+  ];
+
+  if (artistsGrid) {
+    artistsGrid.innerHTML = artists.map(artist => `
+      <div class="artist-card" data-artist="${artist.name}">
+        <img src="${artist.avatar}" alt="${artist.name}">
+        <h3>${artist.name}</h3>
+        <p>${artist.subscribers} subscribers</p>
+      </div>
+    `).join('');
+
+    artistsGrid.querySelectorAll('.artist-card').forEach(card => {
+      card.addEventListener('click', () => {
+        const artistName = card.dataset.artist;
+        // Filter videos by artist name
+        const artistVideos = videos.filter(v =>
+          v.channel.name.toLowerCase().includes(artistName.toLowerCase().split(' ')[0])
+        );
+        if (grid && artistVideos.length > 0) {
+          grid.innerHTML = artistVideos.map(renderVideoCard).join('');
+        }
+      });
+    });
+  }
+
+  // Setup mood buttons
+  const moodBtns = document.querySelectorAll('.mood-card');
+  moodBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      const mood = btn.dataset.mood;
+      // Filter videos based on mood (mock implementation)
+      const moodVideos = videos.slice(0, 12); // Just show some videos for now
+      if (grid) {
+        grid.innerHTML = moodVideos.map(renderVideoCard).join('');
+      }
+    });
+  });
+
+  musicPage.style.display = 'block';
+}
+
+// Render Live Page
+function renderLivePage() {
+  const liveNowGrid = document.getElementById('liveNowGrid');
+  const liveUpcomingGrid = document.getElementById('liveUpcomingGrid');
+  const categoriesGrid = document.getElementById('liveCategoriesGrid');
+
+  // Filter live videos
+  const liveVideos = videos.filter(v => v.live);
+
+  // Render live now
+  if (liveNowGrid) {
+    const nowVideos = liveVideos.length > 0 ? liveVideos : videos.slice(0, 4);
+    liveNowGrid.innerHTML = nowVideos.map(renderVideoCard).join('');
+
+    liveNowGrid.querySelectorAll('.video-card').forEach(card => {
+      card.addEventListener('click', (e) => {
+        if (!e.target.closest('.video-menu')) {
+          const videoId = card.dataset.videoId;
+          openVideoPlayer(videoId);
+        }
+      });
+    });
+  }
+
+  // Render upcoming (mock - just show some regular videos as "upcoming")
+  if (liveUpcomingGrid) {
+    const upcomingVideos = videos.slice(4, 8);
+    liveUpcomingGrid.innerHTML = upcomingVideos.map(renderVideoCard).join('');
+
+    liveUpcomingGrid.querySelectorAll('.video-card').forEach(card => {
+      card.addEventListener('click', () => {
+        openVideoPlayer(card.dataset.videoId);
+      });
+    });
+  }
+
+  // Setup category buttons
+  const categoryBtns = document.querySelectorAll('.live-category-card');
+  categoryBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      const category = btn.dataset.liveCategory;
+      let filtered = videos;
+
+      if (category === 'gaming') {
+        filtered = videos.filter(v => v.category === 'gaming' || v.tags?.includes('gaming'));
+      } else if (category === 'music') {
+        filtered = videos.filter(v => v.category === 'music' || v.tags?.includes('music'));
+      } else if (category === 'live') {
+        filtered = videos.filter(v => v.live);
+      }
+
+      if (liveNowGrid) {
+        liveNowGrid.innerHTML = filtered.slice(0, 8).map(renderVideoCard).join('');
+      }
+    });
+  });
+
+  livePage.style.display = 'block';
 }
 
 function renderSubscriptionsPage() {
