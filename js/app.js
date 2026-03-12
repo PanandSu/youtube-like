@@ -3312,19 +3312,25 @@ function handleFileSelect(file) {
 // Reset upload form
 function resetUploadForm() {
   selectedFile = null;
-  previewVideo.src = '';
-  uploadPreview.style.display = 'none';
-  uploadZone.style.display = 'flex';
-  uploadForm.style.display = 'none';
-  uploadProgress.style.display = 'none';
-  uploadProgressBar.style.width = '0';
-  submitUpload.disabled = true;
+  if (previewVideo) previewVideo.src = '';
+  if (uploadPreview) uploadPreview.style.display = 'none';
+  if (uploadZone) uploadZone.style.display = 'flex';
+  if (uploadForm) uploadForm.style.display = 'none';
+  if (uploadProgress) uploadProgress.style.display = 'none';
+  if (uploadProgressBar) uploadProgressBar.style.width = '0';
+  if (submitUpload) submitUpload.disabled = true;
 
-  document.getElementById('videoTitleInput').value = '';
-  document.getElementById('videoDescriptionInput').value = '';
-  document.getElementById('videoCategoryInput').value = '';
-  document.getElementById('videoTagsInput').value = '';
-  document.getElementById('thumbnailUrlInput').value = '';
+  const videoTitleInput = document.getElementById('videoTitleInput');
+  const videoDescriptionInput = document.getElementById('videoDescriptionInput');
+  const videoCategoryInput = document.getElementById('videoCategoryInput');
+  const videoTagsInput = document.getElementById('videoTagsInput');
+  const thumbnailUrlInput = document.getElementById('thumbnailUrlInput');
+
+  if (videoTitleInput) videoTitleInput.value = '';
+  if (videoDescriptionInput) videoDescriptionInput.value = '';
+  if (videoCategoryInput) videoCategoryInput.value = '';
+  if (videoTagsInput) videoTagsInput.value = '';
+  if (thumbnailUrlInput) thumbnailUrlInput.value = '';
 
   // Reset thumbnail preview
   const thumbnailPreviewImg = document.getElementById('thumbnailPreviewImg');
@@ -3914,8 +3920,8 @@ function setupPlayerControls() {
         }
 
         // Update mini player info
-        miniPlayerTitle.textContent = appCurrentVideo.title;
-        miniPlayerChannel.textContent = appCurrentVideo.channel.name;
+        miniPlayerTitle.textContent = appCurrentVideo?.title || '';
+        miniPlayerChannel.textContent = appCurrentVideo?.channel?.name || '';
 
         // Show mini player, hide main player
         miniPlayer.style.display = 'block';
@@ -4365,7 +4371,7 @@ function showEndScreen() {
       </div>
       <div class="end-screen-info">
         <div class="end-screen-title">${video.title}</div>
-        <div class="end-screen-channel">${video.channel.name}</div>
+        <div class="end-screen-channel">${video.channel?.name || 'Unknown Channel'}</div>
       </div>
     </div>
   `).join('');
