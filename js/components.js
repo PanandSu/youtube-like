@@ -368,32 +368,39 @@ function renderComments(comments) {
 
 // Update video info in player
 function updateVideoPlayerInfo(video) {
-  document.getElementById('videoTitle').textContent = video.title;
+  const videoTitle = document.getElementById('videoTitle');
+  if (videoTitle) videoTitle.textContent = video.title || '';
 
   // Animate view count
   const viewCountEl = document.getElementById('videoViews');
-  animateNumber(viewCountEl, video.views, `${utils.formatNumber(video.views)} views`);
+  if (viewCountEl) animateNumber(viewCountEl, video.views, `${utils.formatNumber(video.views)} views`);
 
   // Animate like count
   const likeCountEl = document.getElementById('likeCount');
-  animateNumber(likeCountEl, video.likes, utils.formatNumber(video.likes));
+  if (likeCountEl) animateNumber(likeCountEl, video.likes, utils.formatNumber(video.likes));
 
   const likeBtn = document.getElementById('likeBtn');
-  likeBtn.classList.toggle('active', video.liked);
+  if (likeBtn) likeBtn.classList.toggle('active', video.liked);
 
-  document.getElementById('channelAvatar').src = video.channel.avatar;
-  document.getElementById('channelName').textContent = video.channel.name;
-  document.getElementById('subscriberCount').textContent = utils.formatSubscribers(video.channel.subscribers);
+  const channelAvatar = document.getElementById('channelAvatar');
+  if (channelAvatar) channelAvatar.src = video.channel?.avatar || '';
+  const channelName = document.getElementById('channelName');
+  if (channelName) channelName.textContent = video.channel?.name || '';
+  const subscriberCount = document.getElementById('subscriberCount');
+  if (subscriberCount) subscriberCount.textContent = utils.formatSubscribers(video.channel?.subscribers || 0);
 
   // Show verified badge if channel is verified
   const channelVerified = document.getElementById('channelVerified');
   if (channelVerified) {
-    channelVerified.style.display = video.channel.verified ? 'inline-flex' : 'none';
+    channelVerified.style.display = video.channel?.verified ? 'inline-flex' : 'none';
   }
 
   const subscribeBtn = document.getElementById('subscribeBtn');
-  subscribeBtn.classList.toggle('subscribed', video.subscribed);
-  subscribeBtn.querySelector('span').textContent = video.subscribed ? 'Subscribed' : 'Subscribe';
+  if (subscribeBtn) {
+    subscribeBtn.classList.toggle('subscribed', video.subscribed);
+    const span = subscribeBtn.querySelector('span');
+    if (span) span.textContent = video.subscribed ? 'Subscribed' : 'Subscribe';
+  }
 
   // Show notification bell when subscribed
   const notificationBell = document.getElementById('notificationBell');
@@ -405,24 +412,25 @@ function updateVideoPlayerInfo(video) {
   const descText = video.description || '';
   const maxLength = 150;
   const showMoreBtn = document.getElementById('showMoreBtn');
+  const descParagraph = descEl?.querySelector('p');
 
   if (descText.length > maxLength) {
-    descEl.querySelector('p').textContent = descText.substring(0, maxLength) + '...';
+    if (descParagraph) descParagraph.textContent = descText.substring(0, maxLength) + '...';
     if (showMoreBtn) {
       showMoreBtn.style.display = 'block';
       showMoreBtn.textContent = 'Show more';
       showMoreBtn.onclick = () => {
         if (showMoreBtn.textContent === 'Show more') {
-          descEl.querySelector('p').textContent = descText;
+          if (descParagraph) descParagraph.textContent = descText;
           showMoreBtn.textContent = 'Show less';
         } else {
-          descEl.querySelector('p').textContent = descText.substring(0, maxLength) + '...';
+          if (descParagraph) descParagraph.textContent = descText.substring(0, maxLength) + '...';
           showMoreBtn.textContent = 'Show more';
         }
       };
     }
   } else {
-    descEl.querySelector('p').textContent = descText;
+    if (descParagraph) descParagraph.textContent = descText;
     if (showMoreBtn) {
       showMoreBtn.style.display = 'none';
     }
