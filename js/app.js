@@ -3501,12 +3501,14 @@ function setupPlayerControls() {
   });
 
   progressBar.addEventListener('click', (e) => {
+    if (!videoElement.duration) return;
     const rect = progressBar.getBoundingClientRect();
     const pos = (e.clientX - rect.left) / rect.width;
     videoElement.currentTime = pos * videoElement.duration;
   });
 
   videoElement.addEventListener('timeupdate', () => {
+    if (!videoElement.duration) return;
     const percent = (videoElement.currentTime / videoElement.duration) * 100;
     progressFilled.style.width = percent + '%';
     progressHandle.style.left = percent + '%';
