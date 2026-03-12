@@ -442,7 +442,7 @@ function setupEventListeners() {
         <i class="ph ph-magnifying-glass"></i>
         <div class="suggestion-content">
           <span class="suggestion-title">${video.title}</span>
-          <span class="suggestion-channel">${video.channel.name}</span>
+          <span class="suggestion-channel">${video.channel?.name || 'Unknown Channel'}</span>
         </div>
       </div>
     `).join('');
@@ -3040,7 +3040,7 @@ function renderRelatedChannels() {
   // Get unique channels from videos
   const channelMap = new Map();
   videos.forEach(video => {
-    if (!channelMap.has(video.channel.id)) {
+    if (video.channel && video.channel.id && !channelMap.has(video.channel.id)) {
       channelMap.set(video.channel.id, video.channel);
     }
   });
@@ -3740,7 +3740,7 @@ function setupPlayerControls() {
           </div>
           <div class="queue-item-info">
             <div class="queue-item-title">${video.title}</div>
-            <div class="queue-item-channel">${video.channel.name}</div>
+            <div class="queue-item-channel">${video.channel?.name || 'Unknown Channel'}</div>
           </div>
           <button class="queue-item-remove" data-index="${index}">
             <i class="ph ph-x"></i>
