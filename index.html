@@ -1367,6 +1367,13 @@
       <div class="explore-header">
         <h1><i class="ph-fill ph-compass"></i> Explore</h1>
         <p>Discover new content</p>
+        <div class="explore-filters">
+          <button class="explore-filter-btn active" data-region="all">Global</button>
+          <button class="explore-filter-btn" data-region="us">United States</button>
+          <button class="explore-filter-btn" data-region="uk">United Kingdom</button>
+          <button class="explore-filter-btn" data-region="in">India</button>
+          <button class="explore-filter-btn" data-region="kr">South Korea</button>
+        </div>
       </div>
 
       <!-- Trending Topics -->
@@ -1404,6 +1411,14 @@
           <button class="trending-topic-card" data-topic="science">
             <i class="ph-fill ph-atom"></i>
             <span>Science</span>
+          </button>
+          <button class="trending-topic-card" data-topic="news">
+            <i class="ph-fill ph-newspaper"></i>
+            <span>News</span>
+          </button>
+          <button class="trending-topic-card" data-topic="podcast">
+            <i class="ph-fill ph-microphone"></i>
+            <span>Podcasts</span>
           </button>
         </div>
       </section>
@@ -1458,10 +1473,24 @@
         </div>
       </section>
 
+      <!-- News Section -->
+      <section class="explore-news-section">
+        <h2><i class="ph-fill ph-newspaper"></i> Latest News</h2>
+        <div class="news-grid" id="exploreNewsGrid">
+        </div>
+      </section>
+
       <!-- Trending Videos -->
       <section class="trending-videos-section">
         <h2><i class="ph-fill ph-chart-line-up"></i> Trending Now</h2>
         <div class="video-grid" id="exploreTrendingGrid">
+        </div>
+      </section>
+
+      <!-- Upcoming Events -->
+      <section class="upcoming-events-section">
+        <h2><i class="ph-fill ph-calendar-check"></i> Upcoming Events</h2>
+        <div class="events-grid" id="exploreEventsGrid">
         </div>
       </section>
     </div>
@@ -1471,7 +1500,34 @@
       <div class="trending-header">
         <h1><i class="ph-fill ph-fire"></i> Trending</h1>
         <p>Popular videos right now</p>
+        <div class="trending-filters">
+          <button class="trending-filter-btn active" data-trending-category="all">All</button>
+          <button class="trending-filter-btn" data-trending-category="music">Music</button>
+          <button class="trending-filter-btn" data-trending-category="gaming">Gaming</button>
+          <button class="trending-filter-btn" data-trending-category="news">News</button>
+          <button class="trending-filter-btn" data-trending-category="sports">Sports</button>
+          <button class="trending-filter-btn" data-trending-category="tech">Tech</button>
+        </div>
+        <div class="trending-region-filter">
+          <select id="trendingRegionSelect">
+            <option value="global">Global</option>
+            <option value="us">United States</option>
+            <option value="uk">United Kingdom</option>
+            <option value="in">India</option>
+            <option value="kr">South Korea</option>
+            <option value="jp">Japan</option>
+            <option value="br">Brazil</option>
+          </select>
+        </div>
       </div>
+
+      <!-- Trending Charts -->
+      <section class="trending-charts-section">
+        <h2><i class="ph-fill ph-chart-bar"></i> Top 10</h2>
+        <div class="trending-charts" id="trendingCharts">
+        </div>
+      </section>
+
       <div class="video-grid" id="trendingGrid">
         <!-- Trending videos will be loaded here -->
       </div>
@@ -1482,9 +1538,21 @@
       <div class="shorts-header">
         <h1><i class="ph-fill ph-play-circle"></i> Shorts</h1>
         <p>Short-form videos</p>
+        <div class="shorts-filters">
+          <button class="shorts-filter-btn active" data-shorts-category="all">All</button>
+          <button class="shorts-filter-btn" data-shorts-category="comedy">Comedy</button>
+          <button class="shorts-filter-btn" data-shorts-category="music">Music</button>
+          <button class="shorts-filter-btn" data-shorts-category="dance">Dance</button>
+          <button class="shorts-filter-btn" data-shorts-category="food">Food</button>
+          <button class="shorts-filter-btn" data-shorts-category="fitness">Fitness</button>
+          <button class="shorts-filter-btn" data-shorts-category=" diy">DIY</button>
+          <button class="shorts-filter-btn" data-shorts-category="pets">Pets</button>
+        </div>
       </div>
-      <div class="shorts-grid" id="shortsGrid">
-        <!-- Shorts will be loaded here -->
+      <div class="shorts-container" id="shortsContainer">
+        <div class="shorts-grid" id="shortsGrid">
+          <!-- Shorts will be loaded here -->
+        </div>
       </div>
     </div>
 
@@ -1518,21 +1586,52 @@
       <div class="music-header">
         <h1><i class="ph-fill ph-music-notes"></i> Music</h1>
         <p>Music videos, live performances, and playlists</p>
+        <div class="music-tabs">
+          <button class="music-tab active" data-music-tab="home">Home</button>
+          <button class="music-tab" data-music-tab="charts">Charts</button>
+          <button class="music-tab" data-music-tab="artists">Artists</button>
+          <button class="music-tab" data-music-tab="new">New Releases</button>
+        </div>
       </div>
-      <div class="music-mood-grid" id="musicMoodGrid">
-        <button class="mood-card" data-mood="chill"><i class="ph-fill ph-wind"></i><span>Chill</span></button>
-        <button class="mood-card" data-mood="energetic"><i class="ph-fill ph-lightning"></i><span>Energetic</span></button>
-        <button class="mood-card" data-mood="happy"><i class="ph-fill ph-smile"></i><span>Happy</span></button>
-        <button class="mood-card" data-mood="sad"><i class="ph-fill ph-heart-break"></i><span>Sad</span></button>
-        <button class="mood-card" data-mood="focus"><i class="ph-fill ph-brain"></i><span>Focus</span></button>
-        <button class="mood-card" data-mood="party"><i class="ph-fill ph-confetti"></i><span>Party</span></button>
-      </div>
+
+      <!-- Mood Mixes -->
+      <section class="music-mood-section">
+        <h2><i class="ph-fill ph-wind"></i> Mood Mixes</h2>
+        <div class="music-mood-grid" id="musicMoodGrid">
+          <button class="mood-card" data-mood="chill"><i class="ph-fill ph-wind"></i><span>Chill</span></button>
+          <button class="mood-card" data-mood="energetic"><i class="ph-fill ph-lightning"></i><span>Energetic</span></button>
+          <button class="mood-card" data-mood="happy"><i class="ph-fill ph-smile"></i><span>Happy</span></button>
+          <button class="mood-card" data-mood="sad"><i class="ph-fill ph-heart-break"></i><span>Sad</span></button>
+          <button class="mood-card" data-mood="focus"><i class="ph-fill ph-brain"></i><span>Focus</span></button>
+          <button class="mood-card" data-mood="party"><i class="ph-fill ph-confetti"></i><span>Party</span></button>
+          <button class="mood-card" data-mood="romance"><i class="ph-fill ph-heart"></i><span>Romance</span></button>
+          <button class="mood-card" data-mood="sleep"><i class="ph-fill ph-moon"></i><span>Sleep</span></button>
+        </div>
+      </section>
+
+      <!-- Music Charts -->
+      <section class="music-charts-section">
+        <h2><i class="ph-fill ph-chart-line-up"></i> Top Charts</h2>
+        <div class="music-charts-grid" id="musicChartsGrid">
+        </div>
+      </section>
+
+      <!-- Featured Artists -->
       <section class="music-featured-section">
-        <h2><i class="ph-fill ph-star"></i> Featured Artists</h2>
+        <h2><i class="ph-fill ph-star"></i> Popular Artists</h2>
         <div class="artists-grid" id="musicArtistsGrid">
           <!-- Artists will be loaded here -->
         </div>
       </section>
+
+      <!-- New Releases -->
+      <section class="music-new-section">
+        <h2><i class="ph-fill ph-sparkle"></i> New Releases</h2>
+        <div class="video-grid" id="musicNewGrid">
+        </div>
+      </section>
+
+      <!-- Music Videos -->
       <section class="music-videos-section">
         <h2><i class="ph-fill ph-video-camera"></i> Music Videos</h2>
         <div class="video-grid" id="musicGrid">
@@ -1546,19 +1645,41 @@
       <div class="live-header">
         <h1><i class="ph-fill ph-broadcast"></i> Live</h1>
         <p>Watch live streams now</p>
+        <div class="live-tabs">
+          <button class="live-tab active" data-live-tab="home">Home</button>
+          <button class="live-tab" data-live-tab="live">Live Now</button>
+          <button class="live-tab" data-live-tab="upcoming">Upcoming</button>
+          <button class="live-tab" data-live-tab="categories">Categories</button>
+        </div>
       </div>
+
+      <!-- Live Now Section -->
       <section class="live-now-section">
-        <h2><i class="ph-fill ph-broadcast"></i> Live Now</h2>
+        <h2><i class="ph-fill ph-broadcast"></i> Live Now <span class="live-badge">Watching</span></h2>
+        <div class="live-featured" id="liveFeatured">
+          <!-- Featured live stream -->
+        </div>
         <div class="live-grid" id="liveNowGrid">
           <!-- Live streams will be loaded here -->
         </div>
       </section>
+
+      <!-- Upcoming Streams -->
       <section class="live-upcoming-section">
-        <h2><i class="ph-fill ph-calendar"></i> Upcoming</h2>
+        <h2><i class="ph-fill ph-calendar"></i> Starting Soon</h2>
         <div class="live-grid" id="liveUpcomingGrid">
           <!-- Upcoming streams -->
         </div>
       </section>
+
+      <!-- Top Live Channels -->
+      <section class="live-top-section">
+        <h2><i class="ph-fill ph-trophy"></i> Top Live Channels</h2>
+        <div class="live-channels-grid" id="liveChannelsGrid">
+        </div>
+      </section>
+
+      <!-- Live Categories -->
       <section class="live-categories-section">
         <h2><i class="ph-fill ph-grid-nine"></i> Browse by Category</h2>
         <div class="live-categories-grid" id="liveCategoriesGrid">
@@ -1568,6 +1689,8 @@
           <button class="live-category-card" data-live-category="news"><i class="ph-fill ph-newspaper"></i><span>News</span></button>
           <button class="live-category-card" data-live-category="cooking"><i class="ph-fill ph-cooking-pot"></i><span>Cooking</span></button>
           <button class="live-category-card" data-live-category="tech"><i class="ph-fill ph-laptop"></i><span>Tech</span></button>
+          <button class="live-category-card" data-live-category="fitness"><i class="ph-fill ph-heartbeat"></i><span>Fitness</span></button>
+          <button class="live-category-card" data-live-category="art"><i class="ph-fill ph-palette"></i><span>Art</span></button>
         </div>
       </section>
     </div>

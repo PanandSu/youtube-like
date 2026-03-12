@@ -2015,6 +2015,20 @@ function renderExplorePage() {
   // Show explore page
   explorePage.style.display = 'block';
 
+  // Setup explore region filter
+  const exploreFilterBtns = document.querySelectorAll('.explore-filter-btn');
+  exploreFilterBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      exploreFilterBtns.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      const region = btn.dataset.region;
+      // Filter content by region (mock implementation)
+      renderExploreTrendingVideos();
+      renderExploreNews();
+      renderExploreEvents();
+    });
+  });
+
   // Render trending topics click handlers
   const topicCards = document.querySelectorAll('.trending-topic-card');
   topicCards.forEach(card => {
@@ -2040,8 +2054,72 @@ function renderExplorePage() {
   // Render featured channels
   renderFeaturedChannels();
 
+  // Render news
+  renderExploreNews();
+
   // Render trending videos
   renderExploreTrendingVideos();
+
+  // Render upcoming events
+  renderExploreEvents();
+}
+
+function renderExploreNews() {
+  const grid = document.getElementById('exploreNewsGrid');
+  if (!grid) return;
+
+  // Mock news data
+  const newsItems = [
+    { title: 'Tech Industry Updates', category: 'Tech', views: '1.2M', time: '2 hours ago', image: 'https://images.unsplash.com/photo-1518770660439-4636190af475?w=400&h=250&fit=crop' },
+    { title: 'Sports Championship Results', category: 'Sports', views: '890K', time: '5 hours ago', image: 'https://images.unsplash.com/photo-1461896836934- voices-of-liberty?w=400&h=250&fit=crop' },
+    { title: 'Music Awards Highlights', category: 'Music', views: '2.1M', time: '1 day ago', image: 'https://images.unsplash.com/photo-1514320291840-2e0a9bf2a9ae?w=400&h=250&fit=crop' },
+    { title: 'Science Discovery News', category: 'Science', views: '567K', time: '3 hours ago', image: 'https://images.unsplash.com/photo-1507413245164-6160d8298b31?w=400&h=250&fit=crop' }
+  ];
+
+  grid.innerHTML = newsItems.map(news => `
+    <div class="news-card" data-title="${news.title}">
+      <img src="${news.image}" alt="${news.title}">
+      <div class="news-info">
+        <span class="news-category">${news.category}</span>
+        <h4>${news.title}</h4>
+        <p>${news.views} views • ${news.time}</p>
+      </div>
+    </div>
+  `).join('');
+
+  grid.querySelectorAll('.news-card').forEach(card => {
+    card.addEventListener('click', () => {
+      // Navigate to news topic
+      const title = card.dataset.title;
+      appCurrentCategory = 'news';
+      loadVideos();
+      handleNavigation('home');
+    });
+  });
+}
+
+function renderExploreEvents() {
+  const grid = document.getElementById('exploreEventsGrid');
+  if (!grid) return;
+
+  // Mock events data
+  const events = [
+    { title: 'Live Concert Stream', date: 'Mar 15, 2026', time: '8:00 PM', image: 'https://images.unsplash.com/photo-1470229722913-7c0e2dbbafd3?w=400&h=250&fit=crop' },
+    { title: 'Gaming Tournament', date: 'Mar 18, 2026', time: '2:00 PM', image: 'https://images.unsplash.com/photo-1542751371-adc38448a05e?w=400&h=250&fit=crop' },
+    { title: 'Tech Conference', date: 'Mar 20, 2026', time: '10:00 AM', image: 'https://images.unsplash.com/photo-1505373877841-8d25f7d46678?w=400&h=250&fit=crop' }
+  ];
+
+  grid.innerHTML = events.map(event => `
+    <div class="event-card" data-title="${event.title}">
+      <img src="${event.image}" alt="${event.title}">
+      <div class="event-info">
+        <h4>${event.title}</h4>
+        <p><i class="ph ph-calendar"></i> ${event.date}</p>
+        <p><i class="ph ph-clock"></i> ${event.time}</p>
+        <button class="btn-primary btn-sm">Set Reminder</button>
+      </div>
+    </div>
+  `).join('');
 }
 
 function renderFeaturedChannels() {
@@ -2247,13 +2325,88 @@ function renderExploreTrendingVideos() {
 }
 
 function renderTrendingPage() {
+  // Hide other pages
+  mainContent.style.display = 'none';
+  videoPlayerPage.style.display = 'none';
+  channelPage.style.display = 'none';
+  historyPage.style.display = 'none';
+  likedVideosPage.style.display = 'none';
+  savedVideosPage.style.display = 'none';
+  subscriptionsPage.style.display = 'none';
+  explorePage.style.display = 'none';
+  shortsPage.style.display = 'none';
+  gamingPage.style.display = 'none';
+  musicPage.style.display = 'none';
+  livePage.style.display = 'none';
+  playlistPage.style.display = 'none';
+
   const grid = document.getElementById('trendingGrid');
   const container = document.getElementById('trendingPage');
+  const chartsGrid = document.getElementById('trendingCharts');
 
-  // Sort videos by views (most viewed = trending)
-  const trendingVideos = [...videos].sort((a, b) => b.views - a.views);
+  // Setup trending category filters
+  const trendingFilterBtns = document.querySelectorAll('.trending-filter-btn');
+  trendingFilterBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      trendingFilterBtns.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      const category = btn.dataset.trendingCategory;
+      renderTrendingVideos(category);
+    });
+  });
 
-  // Render top 20 trending videos
+  // Setup region select
+  const regionSelect = document.getElementById('trendingRegionSelect');
+  if (regionSelect) {
+    regionSelect.addEventListener('change', () => {
+      // Re-render with region (mock implementation)
+      const activeCategory = document.querySelector('.trending-filter-btn.active')?.dataset.trendingCategory || 'all';
+      renderTrendingVideos(activeCategory);
+    });
+  }
+
+  // Render trending charts (top 10)
+  if (chartsGrid) {
+    const trendingVideos = [...videos].sort((a, b) => b.views - a.views).slice(0, 10);
+    chartsGrid.innerHTML = trendingVideos.map((video, index) => `
+      <div class="chart-item" data-video-id="${video.id}">
+        <span class="chart-rank">${index + 1}</span>
+        <img src="${video.thumbnail}" alt="${video.title}">
+        <div class="chart-info">
+          <h4>${video.title.substring(0, 40)}${video.title.length > 40 ? '...' : ''}</h4>
+          <p>${video.channel.name}</p>
+          <span>${utils.formatNumber(video.views)} views</span>
+        </div>
+      </div>
+    `).join('');
+
+    chartsGrid.querySelectorAll('.chart-item').forEach(item => {
+      item.addEventListener('click', () => {
+        openVideoPlayer(item.dataset.videoId);
+      });
+    });
+  }
+
+  // Render trending videos
+  renderTrendingVideos('all');
+
+  container.style.display = 'block';
+}
+
+function renderTrendingVideos(category) {
+  const grid = document.getElementById('trendingGrid');
+  if (!grid) return;
+
+  let trendingVideos = [...videos].sort((a, b) => b.views - a.views);
+
+  // Filter by category if selected
+  if (category && category !== 'all') {
+    trendingVideos = trendingVideos.filter(v =>
+      v.category === category ||
+      v.tags?.some(t => t.toLowerCase().includes(category))
+    );
+  }
+
   grid.innerHTML = trendingVideos.slice(0, 20).map((video, index) => `
     <article class="video-card trending-card" data-video-id="${video.id}">
       <div class="trending-rank">#${index + 1}</div>
@@ -2263,11 +2416,11 @@ function renderTrendingPage() {
       </div>
       <div class="video-details">
         <div class="video-avatar">
-          <img src="${video.channel.avatar}" alt="${video.channel.name}">
+          <img src="${video.channel?.avatar || ''}" alt="${video.channel?.name || ''}">
         </div>
         <div class="video-info">
           <h3 class="video-title">${video.title}</h3>
-          <a href="#" class="video-channel" data-channel-id="${video.channel.id}">${video.channel.name}</a>
+          <a href="#" class="video-channel" data-channel-id="${video.channel?.id || ''}">${video.channel?.name || 'Unknown'}</a>
           <div class="video-meta">
             <span>${utils.formatNumber(video.views)} views</span>
             <span>•</span>
@@ -2287,20 +2440,61 @@ function renderTrendingPage() {
       }
     });
   });
-
-  container.style.display = 'block';
 }
 
 // Render shorts page
 function renderShortsPage() {
+  // Hide other pages
+  mainContent.style.display = 'none';
+  videoPlayerPage.style.display = 'none';
+  channelPage.style.display = 'none';
+  historyPage.style.display = 'none';
+  likedVideosPage.style.display = 'none';
+  savedVideosPage.style.display = 'none';
+  subscriptionsPage.style.display = 'none';
+  trendingPage.style.display = 'none';
+  explorePage.style.display = 'none';
+  gamingPage.style.display = 'none';
+  musicPage.style.display = 'none';
+  livePage.style.display = 'none';
+  playlistPage.style.display = 'none';
+
   const grid = document.getElementById('shortsGrid');
   const container = document.getElementById('shortsPage');
 
-  // Filter videos that would work well as shorts (shorter duration)
-  const shorts = videos.filter(v => {
+  // Setup shorts category filters
+  const shortsFilterBtns = document.querySelectorAll('.shorts-filter-btn');
+  shortsFilterBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      shortsFilterBtns.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      const category = btn.dataset.shortsCategory;
+      renderShortsVideos(category);
+    });
+  });
+
+  // Render shorts
+  renderShortsVideos('all');
+
+  container.style.display = 'block';
+}
+
+function renderShortsVideos(category) {
+  const grid = document.getElementById('shortsGrid');
+  if (!grid) return;
+
+  let shorts = videos.filter(v => {
     const durationSecs = parseVideoDuration(v.duration);
     return durationSecs <= 180; // 3 minutes or less
   });
+
+  // Filter by category if selected
+  if (category && category !== 'all') {
+    shorts = shorts.filter(v =>
+      v.category === category ||
+      v.tags?.some(t => t.toLowerCase().includes(category))
+    );
+  }
 
   // If not enough short videos, duplicate and modify some
   let shortsToShow = [...shorts];
@@ -2318,15 +2512,24 @@ function renderShortsPage() {
       <div class="short-thumbnail">
         <img src="${video.thumbnail}" alt="${video.title}" loading="lazy">
         <span class="short-duration">${video.duration}</span>
+        <div class="short-overlay">
+          <button class="short-action like-btn"><i class="ph-fill ph-heart"></i><span>${utils.formatNumber(Math.floor(video.views * 0.1))}</span></button>
+          <button class="short-action comment-btn"><i class="ph-fill ph-chat-circle"></i><span>${Math.floor(Math.random() * 500)}</span></button>
+          <button class="short-action share-btn"><i class="ph-fill ph-share-network"></i><span>Share</span></button>
+        </div>
       </div>
       <div class="short-info">
         <h3 class="short-title">${video.title}</h3>
+        <div class="short-channel">
+          <img src="${video.channel?.avatar || ''}" alt="${video.channel?.name || ''}">
+          <span>${video.channel?.name || 'Unknown Channel'}</span>
+        </div>
         <div class="short-meta">
           <span class="short-views">
             <i class="ph-fill ph-eye"></i>
-            ${utils.formatNumber(video.views)}
+            ${utils.formatNumber(video.views)} views
           </span>
-          <span>${video.channel?.name || 'Unknown Channel'}</span>
+          <span>${utils.timeAgo(video.uploadedAt)}</span>
         </div>
       </div>
     </article>
@@ -2334,13 +2537,21 @@ function renderShortsPage() {
 
   // Add click handlers
   grid.querySelectorAll('.short-card').forEach(card => {
-    card.addEventListener('click', () => {
+    card.addEventListener('click', (e) => {
+      if (e.target.closest('.short-action')) return;
       const videoId = card.dataset.videoId;
       openVideoPlayer(videoId);
     });
   });
 
-  container.style.display = 'block';
+  // Add like/comment/share handlers
+  grid.querySelectorAll('.like-btn').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      btn.classList.toggle('liked');
+      utils.showToast(btn.classList.contains('liked') ? 'Liked!' : 'Unliked');
+    });
+  });
 }
 
 // Render Gaming Page
@@ -2406,9 +2617,98 @@ function renderGamingPage() {
 
 // Render Music Page
 function renderMusicPage() {
+  // Hide other pages
+  mainContent.style.display = 'none';
+  videoPlayerPage.style.display = 'none';
+  channelPage.style.display = 'none';
+  historyPage.style.display = 'none';
+  likedVideosPage.style.display = 'none';
+  savedVideosPage.style.display = 'none';
+  subscriptionsPage.style.display = 'none';
+  trendingPage.style.display = 'none';
+  shortsPage.style.display = 'none';
+  gamingPage.style.display = 'none';
+  explorePage.style.display = 'none';
+  livePage.style.display = 'none';
+  playlistPage.style.display = 'none';
+
   const grid = document.getElementById('musicGrid');
   const artistsGrid = document.getElementById('musicArtistsGrid');
   const moodGrid = document.getElementById('musicMoodGrid');
+  const chartsGrid = document.getElementById('musicChartsGrid');
+  const newGrid = document.getElementById('musicNewGrid');
+
+  // Setup music tabs
+  const musicTabs = document.querySelectorAll('.music-tab');
+  musicTabs.forEach(tab => {
+    tab.addEventListener('click', () => {
+      musicTabs.forEach(t => t.classList.remove('active'));
+      tab.classList.add('active');
+      const tabName = tab.dataset.musicTab;
+      // Show/hide sections based on tab
+      document.querySelector('.music-mood-section')?.style.setProperty('display', tabName === 'home' ? 'block' : 'none');
+      document.querySelector('.music-charts-section')?.style.setProperty('display', tabName === 'charts' ? 'block' : 'none');
+      document.querySelector('.music-featured-section')?.style.setProperty('display', tabName === 'artists' ? 'block' : 'none');
+      document.querySelector('.music-new-section')?.style.setProperty('display', tabName === 'new' ? 'block' : 'none');
+      document.querySelector('.music-videos-section')?.style.setProperty('display', tabName === 'home' ? 'block' : 'none');
+    });
+  });
+
+  // Render music charts
+  if (chartsGrid) {
+    const chartVideos = [...videos].sort((a, b) => b.views - a.views).slice(0, 10);
+    chartsGrid.innerHTML = chartVideos.map((video, index) => `
+      <div class="chart-track" data-video-id="${video.id}">
+        <span class="chart-position">${index + 1}</span>
+        <img src="${video.thumbnail}" alt="${video.title}">
+        <div class="chart-track-info">
+          <h4>${video.title.substring(0, 35)}${video.title.length > 35 ? '...' : ''}</h4>
+          <p>${video.channel?.name || 'Unknown'}</p>
+        </div>
+        <span class="chart-views">${utils.formatNumber(video.views)}</span>
+      </div>
+    `).join('');
+
+    chartsGrid.querySelectorAll('.chart-track').forEach(track => {
+      track.addEventListener('click', () => {
+        openVideoPlayer(track.dataset.videoId);
+      });
+    });
+  }
+
+  // Render new releases
+  if (newGrid) {
+    const newVideos = [...videos].sort((a, b) => new Date(b.uploadedAt) - new Date(a.uploadedAt)).slice(0, 8);
+    newGrid.innerHTML = newVideos.map(video => `
+      <article class="video-card" data-video-id="${video.id}">
+        <div class="video-thumbnail">
+          <img src="${video.thumbnail}" alt="${video.title}" loading="lazy">
+          <span class="video-duration">${video.duration}</span>
+          <span class="new-badge">NEW</span>
+        </div>
+        <div class="video-details">
+          <div class="video-avatar">
+            <img src="${video.channel?.avatar || ''}" alt="${video.channel?.name || ''}">
+          </div>
+          <div class="video-info">
+            <h3 class="video-title">${video.title}</h3>
+            <a href="#" class="video-channel">${video.channel?.name || 'Unknown'}</a>
+            <div class="video-meta">
+              <span>${utils.formatNumber(video.views)} views</span>
+              <span>•</span>
+              <span>${utils.timeAgo(video.uploadedAt)}</span>
+            </div>
+          </div>
+        </div>
+      </article>
+    `).join('');
+
+    newGrid.querySelectorAll('.video-card').forEach(card => {
+      card.addEventListener('click', () => {
+        openVideoPlayer(card.dataset.videoId);
+      });
+    });
+  }
 
   // Filter music videos
   const musicVideos = videos.filter(v => v.category === 'music' || v.tags?.includes('music'));
@@ -2437,7 +2737,9 @@ function renderMusicPage() {
     { name: 'BTS', avatar: 'https://picsum.photos/seed/artist3/200', subscribers: '72M' },
     { name: 'Ariana Grande', avatar: 'https://picsum.photos/seed/artist4/200', subscribers: '52M' },
     { name: 'Drake', avatar: 'https://picsum.photos/seed/artist5/200', subscribers: '45M' },
-    { name: 'Billie Eilish', avatar: 'https://picsum.photos/seed/artist6/200', subscribers: '38M' }
+    { name: 'Billie Eilish', avatar: 'https://picsum.photos/seed/artist6/200', subscribers: '38M' },
+    { name: 'The Weeknd', avatar: 'https://picsum.photos/seed/artist7/200', subscribers: '42M' },
+    { name: 'Bad Bunny', avatar: 'https://picsum.photos/seed/artist8/200', subscribers: '35M' }
   ];
 
   if (artistsGrid) {
@@ -2446,11 +2748,16 @@ function renderMusicPage() {
         <img src="${artist.avatar}" alt="${artist.name}">
         <h3>${artist.name}</h3>
         <p>${artist.subscribers} subscribers</p>
+        <button class="subscribe-btn btn-sm">Subscribe</button>
       </div>
     `).join('');
 
     artistsGrid.querySelectorAll('.artist-card').forEach(card => {
-      card.addEventListener('click', () => {
+      card.addEventListener('click', (e) => {
+        if (e.target.classList.contains('subscribe-btn')) {
+          utils.showToast('Subscribed!');
+          return;
+        }
         const artistName = card.dataset.artist;
         // Filter videos by artist name
         const artistVideos = videos.filter(v =>
@@ -2467,9 +2774,11 @@ function renderMusicPage() {
   const moodBtns = document.querySelectorAll('.mood-card');
   moodBtns.forEach(btn => {
     btn.addEventListener('click', () => {
+      moodBtns.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
       const mood = btn.dataset.mood;
       // Filter videos based on mood (mock implementation)
-      const moodVideos = videos.slice(0, 12); // Just show some videos for now
+      const moodVideos = videos.slice(0, 12);
       if (grid) {
         grid.innerHTML = moodVideos.map(renderVideoCard).join('');
       }
@@ -2481,9 +2790,89 @@ function renderMusicPage() {
 
 // Render Live Page
 function renderLivePage() {
+  // Hide other pages
+  mainContent.style.display = 'none';
+  videoPlayerPage.style.display = 'none';
+  channelPage.style.display = 'none';
+  historyPage.style.display = 'none';
+  likedVideosPage.style.display = 'none';
+  savedVideosPage.style.display = 'none';
+  subscriptionsPage.style.display = 'none';
+  trendingPage.style.display = 'none';
+  shortsPage.style.display = 'none';
+  gamingPage.style.display = 'none';
+  musicPage.style.display = 'none';
+  explorePage.style.display = 'none';
+  playlistPage.style.display = 'none';
+
   const liveNowGrid = document.getElementById('liveNowGrid');
   const liveUpcomingGrid = document.getElementById('liveUpcomingGrid');
   const categoriesGrid = document.getElementById('liveCategoriesGrid');
+  const liveFeatured = document.getElementById('liveFeatured');
+  const liveChannelsGrid = document.getElementById('liveChannelsGrid');
+
+  // Setup live tabs
+  const liveTabs = document.querySelectorAll('.live-tab');
+  liveTabs.forEach(tab => {
+    tab.addEventListener('click', () => {
+      liveTabs.forEach(t => t.classList.remove('active'));
+      tab.classList.add('active');
+      const tabName = tab.dataset.liveTab;
+      // Show/hide sections based on tab
+      document.querySelector('.live-now-section')?.style.setProperty('display', tabName === 'home' || tabName === 'live' ? 'block' : 'none');
+      document.querySelector('.live-upcoming-section')?.style.setProperty('display', tabName === 'home' || tabName === 'upcoming' ? 'block' : 'none');
+      document.querySelector('.live-top-section')?.style.setProperty('display', tabName === 'home' ? 'block' : 'none');
+      document.querySelector('.live-categories-section')?.style.setProperty('display', tabName === 'categories' ? 'block' : 'block');
+    });
+  });
+
+  // Render featured live stream
+  if (liveFeatured) {
+    const featuredVideo = videos.find(v => v.live) || videos[0];
+    if (featuredVideo) {
+      liveFeatured.innerHTML = `
+        <div class="live-featured-card" data-video-id="${featuredVideo.id}">
+          <img src="${featuredVideo.thumbnail}" alt="${featuredVideo.title}">
+          <div class="live-featured-overlay">
+            <span class="live-badge-large"><i class="ph-fill ph-broadcast"></i> LIVE</span>
+            <h3>${featuredVideo.title}</h3>
+            <p>${featuredVideo.channel?.name || 'Unknown'}</p>
+            <p class="live-viewers"><i class="ph-fill ph-eye"></i> ${utils.formatNumber(Math.floor(featuredVideo.views * 0.3))} watching</p>
+            <button class="btn-primary">Watch Now</button>
+          </div>
+        </div>
+      `;
+
+      liveFeatured.querySelector('.live-featured-card')?.addEventListener('click', () => {
+        openVideoPlayer(featuredVideo.id);
+      });
+    }
+  }
+
+  // Render top live channels
+  if (liveChannelsGrid) {
+    const channels = [...new Set(videos.map(v => v.channel).filter(Boolean))].slice(0, 6);
+    liveChannelsGrid.innerHTML = channels.map(channel => `
+      <div class="live-channel-card" data-channel-id="${channel.id}">
+        <img src="${channel.avatar || ''}" alt="${channel.name || ''}">
+        <div class="live-channel-info">
+          <h4>${channel.name || 'Unknown'}</h4>
+          <p>${utils.formatNumber(channel.subscribers || 0)} subscribers</p>
+          <button class="subscribe-btn btn-sm">Subscribe</button>
+        </div>
+      </div>
+    `).join('');
+
+    liveChannelsGrid.querySelectorAll('.live-channel-card').forEach(card => {
+      card.addEventListener('click', (e) => {
+        if (e.target.classList.contains('subscribe-btn')) {
+          utils.showToast('Subscribed!');
+          return;
+        }
+        openChannelPage(card.dataset.channelId);
+      });
+    });
+  }
 
   // Filter live videos
   const liveVideos = videos.filter(v => v.live);
@@ -2491,7 +2880,29 @@ function renderLivePage() {
   // Render live now
   if (liveNowGrid) {
     const nowVideos = liveVideos.length > 0 ? liveVideos : videos.slice(0, 4);
-    liveNowGrid.innerHTML = nowVideos.map(renderVideoCard).join('');
+    liveNowGrid.innerHTML = nowVideos.map(video => `
+      <article class="video-card live-card" data-video-id="${video.id}">
+        <div class="video-thumbnail">
+          <img src="${video.thumbnail}" alt="${video.title}" loading="lazy">
+          <span class="video-duration">${video.duration}</span>
+          <span class="live-indicator"><i class="ph-fill ph-broadcast"></i> LIVE</span>
+        </div>
+        <div class="video-details">
+          <div class="video-avatar">
+            <img src="${video.channel?.avatar || ''}" alt="${video.channel?.name || ''}">
+          </div>
+          <div class="video-info">
+            <h3 class="video-title">${video.title}</h3>
+            <a href="#" class="video-channel">${video.channel?.name || 'Unknown'}</a>
+            <div class="video-meta">
+              <span><i class="ph-fill ph-eye"></i> ${utils.formatNumber(Math.floor(video.views * 0.2))}</span>
+              <span>•</span>
+              <span>Live now</span>
+            </div>
+          </div>
+        </div>
+      </article>
+    `).join('');
 
     liveNowGrid.querySelectorAll('.video-card').forEach(card => {
       card.addEventListener('click', (e) => {
@@ -2506,7 +2917,29 @@ function renderLivePage() {
   // Render upcoming (mock - just show some regular videos as "upcoming")
   if (liveUpcomingGrid) {
     const upcomingVideos = videos.slice(4, 8);
-    liveUpcomingGrid.innerHTML = upcomingVideos.map(renderVideoCard).join('');
+    liveUpcomingGrid.innerHTML = upcomingVideos.map(video => `
+      <article class="video-card upcoming-card" data-video-id="${video.id}">
+        <div class="video-thumbnail">
+          <img src="${video.thumbnail}" alt="${video.title}" loading="lazy">
+          <span class="video-duration">${video.duration}</span>
+          <span class="upcoming-badge">Starting soon</span>
+        </div>
+        <div class="video-details">
+          <div class="video-avatar">
+            <img src="${video.channel?.avatar || ''}" alt="${video.channel?.name || ''}">
+          </div>
+          <div class="video-info">
+            <h3 class="video-title">${video.title}</h3>
+            <a href="#" class="video-channel">${video.channel?.name || 'Unknown'}</a>
+            <div class="video-meta">
+              <span>${utils.formatNumber(video.views)} views</span>
+              <span>•</span>
+              <span>Starting in ${Math.floor(Math.random() * 60) + 10} min</span>
+            </div>
+          </div>
+        </div>
+      </article>
+    `).join('');
 
     liveUpcomingGrid.querySelectorAll('.video-card').forEach(card => {
       card.addEventListener('click', () => {
@@ -2519,6 +2952,8 @@ function renderLivePage() {
   const categoryBtns = document.querySelectorAll('.live-category-card');
   categoryBtns.forEach(btn => {
     btn.addEventListener('click', () => {
+      categoryBtns.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
       const category = btn.dataset.liveCategory;
       let filtered = videos;
 
