@@ -22,6 +22,7 @@ const uploadProgressBar = document.getElementById('uploadProgressBar');
 const uploadProgressText = document.getElementById('uploadProgressText');
 const videoGrid = document.getElementById('videoGrid');
 const videoPlayerPage = document.getElementById('videoPlayerPage');
+const pagesContainer = document.getElementById('pagesContainer');
 const mainContent = document.querySelector('.main-content');
 const videoElement = document.getElementById('videoElement');
 
@@ -1945,6 +1946,7 @@ function handleNavigation(route) {
   explorePage.style.display = 'none';
   settingsPage.style.display = 'none';
   studioPage.style.display = 'none';
+  pagesContainer.style.display = 'none';
 
   // Show selected page
   switch (route) {
@@ -1953,39 +1955,51 @@ function handleNavigation(route) {
       loadVideos();
       break;
     case 'explore':
+      pagesContainer.style.display = 'block';
       renderExplorePage();
       break;
     case 'trending':
+      pagesContainer.style.display = 'block';
       renderTrendingPage();
       break;
     case 'shorts':
+      pagesContainer.style.display = 'block';
       renderShortsPage();
       break;
     case 'gaming':
+      pagesContainer.style.display = 'block';
       renderGamingPage();
       break;
     case 'music':
+      pagesContainer.style.display = 'block';
       renderMusicPage();
       break;
     case 'live':
+      pagesContainer.style.display = 'block';
       renderLivePage();
       break;
     case 'settings':
+      pagesContainer.style.display = 'block';
       renderSettingsPage();
       break;
     case 'studio':
+      pagesContainer.style.display = 'block';
       renderStudioPage();
       break;
     case 'subscriptions':
+      pagesContainer.style.display = 'block';
       renderSubscriptionsPage();
       break;
     case 'library':
+      pagesContainer.style.display = 'block';
       renderSavedPage();
       break;
     case 'history':
+      pagesContainer.style.display = 'block';
       renderHistoryPage();
       break;
     case 'liked':
+      pagesContainer.style.display = 'block';
       renderLikedPage();
       break;
     case 'my-channel':
@@ -5664,6 +5678,7 @@ function openVideoPlayer(videoId) {
   likedVideosPage.style.display = 'none';
   savedVideosPage.style.display = 'none';
   subscriptionsPage.style.display = 'none';
+  pagesContainer.style.display = 'none';
   videoPlayerPage.style.display = '';
   videoPlayerPage.classList.add('active');
 
