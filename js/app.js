@@ -2028,13 +2028,13 @@ function renderExplorePage() {
 
 function renderFeaturedChannels() {
   const grid = document.getElementById('featuredChannelsGrid');
-  const featuredChannels = [...new Set(videos.map(v => v.channel))].slice(0, 6);
+  const featuredChannels = [...new Set(videos.map(v => v.channel).filter(Boolean))].slice(0, 6);
 
   grid.innerHTML = featuredChannels.map(channel => `
     <div class="featured-channel-card" data-channel-id="${channel.id}">
-      <img src="${channel.avatar}" alt="${channel.name}">
-      <h4>${channel.name}</h4>
-      <span class="featured-subs">${formatNumber(channel.subscribers)} subscribers</span>
+      <img src="${channel.avatar || ''}" alt="${channel.name || ''}">
+      <h4>${channel.name || 'Unknown'}</h4>
+      <span class="featured-subs">${utils.formatNumber(channel.subscribers || 0)} subscribers</span>
       <button class="subscribe-btn" data-channel-id="${channel.id}">
         <i class="ph-fill ph-bell"></i>
         Subscribe
@@ -2302,7 +2302,7 @@ function renderShortsPage() {
             <i class="ph-fill ph-eye"></i>
             ${utils.formatNumber(video.views)}
           </span>
-          <span>${video.channel.name}</span>
+          <span>${video.channel?.name || 'Unknown Channel'}</span>
         </div>
       </div>
     </article>
@@ -2334,8 +2334,8 @@ function renderSubscriptionsPage() {
   emptyState.style.display = 'none';
   grid.innerHTML = user.subscribedChannels.map(channel => `
     <div class="subscription-card" data-channel-id="${channel.id}">
-      <img src="${channel.avatar}" alt="${channel.name}">
-      <h3>${channel.name}</h3>
+      <img src="${channel.avatar || ''}" alt="${channel.name || ''}">
+      <h3>${channel.name || 'Unknown'}</h3>
       <p>Subscribed</p>
     </div>
   `).join('');
@@ -3049,9 +3049,9 @@ function renderRelatedChannels() {
 
   relatedChannelsGrid.innerHTML = channels.map(channel => `
     <div class="related-channel-card" data-channel-id="${channel.id}">
-      <img src="${channel.avatar}" alt="${channel.name}">
-      <div class="related-channel-name">${channel.name}</div>
-      <div class="related-channel-subs">${utils.formatNumber(channel.subscribers)} subscribers</div>
+      <img src="${channel.avatar || ''}" alt="${channel.name || ''}">
+      <div class="related-channel-name">${channel.name || 'Unknown'}</div>
+      <div class="related-channel-subs">${utils.formatNumber(channel.subscribers || 0)} subscribers</div>
       <button class="related-channel-subscribe">Subscribe</button>
     </div>
   `).join('');
