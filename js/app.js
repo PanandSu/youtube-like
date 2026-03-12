@@ -2007,6 +2007,9 @@ function renderExplorePage() {
   subscriptionsPage.style.display = 'none';
   trendingPage.style.display = 'none';
   shortsPage.style.display = 'none';
+  gamingPage.style.display = 'none';
+  musicPage.style.display = 'none';
+  livePage.style.display = 'none';
   playlistPage.style.display = 'none';
 
   // Show explore page
@@ -2088,6 +2091,9 @@ function renderSettingsPage() {
   subscriptionsPage.style.display = 'none';
   trendingPage.style.display = 'none';
   shortsPage.style.display = 'none';
+  gamingPage.style.display = 'none';
+  musicPage.style.display = 'none';
+  livePage.style.display = 'none';
   explorePage.style.display = 'none';
 
   // Show settings page
@@ -2109,6 +2115,9 @@ function renderStudioPage() {
   subscriptionsPage.style.display = 'none';
   trendingPage.style.display = 'none';
   shortsPage.style.display = 'none';
+  gamingPage.style.display = 'none';
+  musicPage.style.display = 'none';
+  livePage.style.display = 'none';
   explorePage.style.display = 'none';
   settingsPage.style.display = 'none';
 
